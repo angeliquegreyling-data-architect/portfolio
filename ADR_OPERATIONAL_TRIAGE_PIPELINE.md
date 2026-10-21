@@ -45,7 +45,7 @@ Initial system proposals suggested utilizing basic cloud-native automation flows
 - *Option A: Nested Low-Code Conditional Loops.* Build extensive looping conditional branches within standard cloud flows to dynamically parse fluctuating multi-tier property trees. (Rejected: Extreme execution latency, brittle error-handling bounds, and a high probability of total pipeline failure during minor front-end form adaptations).
 
 #### 3. Architectural Justification & Trade-Off Mitigation
-Frail, low-code integration loops were decommissioned for raw data parsing and flattening tasks. Instead, data transformation duties were shifted to an air-gapped **Scripting Proxy Engine** utilizing robust procedural code execution environments. The script containers programmatically open the spreadsheet blobs, unmerge nested layout headers, execute algorithmic column fill-down loops to safely bind employee identification keys, and output a clean, flat, strongly-typed data contract, reducing tracking workflow processing debt by over 70%.
+Frail, low-code integration loops were decommissioned for raw data parsing and flattening tasks. Instead, data transformation duties were shifted to an air-gapped **Scripting Proxy Engine** utilizing robust procedural code execution environments (TypeScript). The script containers programmatically open the spreadsheet blobs, unmerge nested layout headers, execute algorithmic column fill-down loops to safely bind employee identification keys, and output a clean, flat, strongly-typed data contract, reducing tracking workflow processing debt by over 70%.
 
 ---
 
