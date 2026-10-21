@@ -25,7 +25,7 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 
 ### INDEX OF ACTIVE ARCHITECTURAL SYSTEMS & REPOSITORIES
 
-1. [System Design Log: ADR-OTP-METRO-TRANSIT](./ADR_OTP_METRO_TRANSIT.md)
+1. [System Design Log: ADR-OPERATIONAL-TRIAGE-PIPELINE](./ADR_OPERATIONAL_TRIAGE_PIPELINE.md)
    - *Core Architecture:* Comprehensive Technical Solutions Triage explaining the architectural constraints behind migrating regional transit logistics reporting layers off fragile APIs and webhooks into an automated asynchronous staging sandbox.
 2. [Production Relational Schema Database Sandbox: schema.sql](./schema.sql)
    - *Core Architecture:* Enterprise-grade PostgreSQL setup manifest demonstrating dimensional star-schema modeling, composite foreign-key constraints, and custom indexes optimized for Power BI Direct-Query performance.
