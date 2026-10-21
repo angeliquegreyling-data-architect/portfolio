@@ -1,7 +1,7 @@
 # ANGELIQUE GREYLING
 ## PRINCIPAL AUTOMATION ARCHITECT & ENTERPRISE SYSTEMS SOLUTIONS ENGINEER
 - Email: angeliquegreyling@gmail.com
-- Mobile/WhatsApp: +27 72 766 9120
+- Contact: angeliquegreyling@gmail.com (Detailed CV, Video Introduction, and Phone Credentials Available on Request)
 - Hub: Secunda, South Africa (Fully Remote - Global US/UK Time-Shift Aligned)
 
 ---
