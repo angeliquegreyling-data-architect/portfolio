@@ -1,85 +1,70 @@
-# INTEGRATION ARCHITECTURE: AUTOMATED INGESTION FLOW
-## DECOUPLED WEBHOOK EDGE PARSING & CLOUD STAGING LINEAGE
-- **Status:** Active / Production Specifications Verified
-- **Systems Engineer:** Angelique Greyling (Principal Automation Architect)
-- **Target Ingestion Route:** Connecteam Form Submissions → Zapier Middleware Proxy → Schema Staging Repository
+# ENTERPRISE DATA INTEGRATION PIPELINE & ROUTING ARCHITECTURE
+## PLATFORM COUPLING OVERVIEW & AUTOMATED TRANSFORMATION ENGINE
+- **Status:** Operational / Highly Resilient Pipeline
+- **Architect:** Angelique Greyling (Principal Systems Solutions Architect)
+- **Environment:** Cloud Staging & Decoupled Data Operations Framework
 
 ---
 
-### INGESTION PIPELINE DATAFLOW MAP
+### PIPELINE ENGINE EXECUTION FLOW
 
 ```text
- [Connecteam Form Client] 
-           │
-           ▼ (1. Instant JSON POST Event Request Payload)
- [Zapier Secure Webhook Edge Listener] ──► URL: https://zapier.com
-           │
-           ▼ (2. Asynchronous Decoupled Handoff)
- [Google Sheets Cloud Buffer Repository] ──► Filename: Connecteam_Checklist_Staging_Buffer
-           │
-           ▼ (3. Scheduled Semantic Refresh Window)
- [Power BI Production Model Gateway] ──► M-Query Dynamic Type-Enforcement Mapping Engine
+ [STAGE 1: ISOLATION] ──► Inbound Automated Report Drop-off (Air-Gapped Cloud Storage)
+          │
+          ▼
+ [STAGE 2: EXTRACTION] ──► Scripting Proxy Engine (Header Unmerging & Row Fill-Down)
+          │
+          ▼
+ [STAGE 3: INGESTION] ──► Target Database Gate (Zero-Touch Local Relational Overwrite)
+          │
+          ▼
+ [STAGE 4: SEMANTIC] ──► Power BI Circuit-Breaker Mesh (Dynamic Schema Drift Fault Tolerance)
 ```
 
 ---
 
-### STEP-BY-STEP DATA PROCESSING PIPELINE DESIGN
+### STAGE 1: PERIMETER ISOLATION BARRIER (CLOUD BLOB EXPORT)
 
-#### Phase 1: Webhook Edge Capture (Zapier Trigger Config)
-- **Engine Trigger Block:** Webhooks by Zapier (Catch Hook Setup).
-- **Target Connection URI:** `https://zapier.com`
-- **Data Payload Format:** JSON Application Data Stream.
-- **Architectural Rationale:** Acting as the primary, non-authenticated public perimeter gate, Zapier captures live data payloads immediately as field operators execute submissions. By keeping this connection decoupled from the operational relational database, any schema alterations or user entry failures are entirely isolated at the edge listener before hitting production memory tiers.
+#### 1. Technical Implementation
+Direct, synchronous upstream API integration hooks are permanently decommissioned. The ingestion sequence initializes via a decoupled scheduler within the mobile workforce platform. Every 24 hours, the system compiles transactional payloads, formats them into structural spreadsheet blobs, and routes them to an air-gapped cloud storage container via secure mail-attachment routing protocols.
 
-#### Phase 2: Decoupled Buffering & Logging (Google Sheets Action Config)
-- **Engine Middleware Block:** Google Sheets Enterprise App Integration.
-- **Action Event Enforced:** Create Spreadsheet Row (`Append Only`).
-- **Target Target Sheet Resource:** `Connecteam_Checklist_Staging_Buffer`
-- **Field Variable Contracts Enforced:**
-  - `submission_id`  <──> `{{Step 1: Payload.submission_id}}`
-  - `employee_id`    <──> `{{Step 1: Payload.employee_id}}`
-  - `date`           <──> `{{Step 1: Payload.date}}`
-  - `asset_tag`      <──> `{{Step 1: Payload.asset_tag}}`
-  - `asset_type`     <──> `{{Step 1: Payload.asset_type}}`
-  - `issue_found`    <──> `{{Step 1: Payload.issue_found}}`
-  - `photos_attached`<──> `{{Step 1: Payload.photos_attached}}`
-
-#### Phase 3: Star-Schema Data Contract Ingestion (Power BI Desktop Execution)
-- **Model Inbound Vector:** Power BI Desktop Web Data Connector.
-- **Source Authentication URI:** Target Google Sheets Binary Sheet Output Link.
-- **Power Query (M-Query) Ingestion Transformation Logic Script:**
-```powerquery
-let
-    Source = Web.Page(Web.Contents("https://google.com")),
-    Data_Table = Source{0}[Data],
-    PromotedHeaders = Table.TransformColumnTypes(Data_Table,{{"submission_id", type text}, {"employee_id", type text}, {"date", type date}, {"asset_tag", type text}, {"asset_type", type text}, {"issue_found", type logical}, {"photos_attached", Int64.Type}}),
-    SchemaCircuitBreaker = Table.TransformColumnTypes(PromotedHeaders, {{"submission_id", type text}, {"date", type date}})
-in
-    SchemaCircuitBreaker
-```
+#### 2. Risk Mitigation Matrix
+- **Boundary Shielding:** The localized core network is entirely insulated from external API payload spikes or unscheduled modifications from the third-party infrastructure.
+- **State Serialization:** By converting transient data streams into physical, version-controlled spreadsheet fixtures at the perimeter, the pipeline gains an immutable history trail that supports point-in-time recovery audits without downstream payload pollution.
 
 ---
 
-### AUDIT VERIFICATION LOG: TESTING WEBHOOK STABILITY
+### STAGE 2: PROCESS NORMALIZATION ENGINE (ROW FILL-DOWN & PARSING LOOP)
 
-To thoroughly verify data contract resilience across runtime environments, a production-grade payload execution pass was manually triggered using an enterprise REST client interface (ReqBin tool space).
+#### 1. Automated Processing Loop
+An automated cron-trigger activates an isolated **TypeScript Scripting Proxy Engine Container**. The execution engine programmatically accesses the air-gapped staging layer, loads the target binary blobs into volatile system memory arrays, and runs a multi-tier transformation script to resolve structural layout variations.
 
-#### Test Payload Map (JSON Application Payload Object):
-```json
-{
-  "submission_id": "CL2849",
-  "employee_id": "E118",
-  "date": "2025-07-29",
-  "asset_tag": "DB32",
-  "asset_type": "DB-Board",
-  "issue_found": "false",
-  "photos_attached": 0
-}
-```
-
-#### Pipeline Ingestion Response State:
-- **HTTP Endpoint Processing Status Code:** `200 OK` (Payload safely processed by Zapier Webhook edge listener).
-- **Staging Matrix State:** Row inserted instantly at target spreadsheet position `Row 10`, confirming that data types match cleanly across integration borders.
-- **Reporting Refresh Pass:** Power BI semantic layout data refresh triggered manually, successfully pulling the newly appended transaction records without schema conflicts.
+#### 2. Algorithmic Transformation Rules
+- **Header Structure Unmerging:** The script scans the entry matrix coordinates, unmerges multi-column layout groupings, and maps distinct field indices into a normalized flat-file array.
+- **Employee Identifier Key Binding:** Missing parameters created by human interface limitations are caught using an algorithmic row-traversal loop. The script executes a top-down forward-fill mechanism, tracking the active employee master token and binding it dynamically across corresponding transactional timestamp sub-rows. This processes and structurally sanitizes messy data before database ingestion.
 
 ---
+
+### STAGE 3: TARGET INGESTION GATE (ZERO-TOUCH DATABASE OVERWRITE)
+
+#### 1. Relational Insertion Logic
+The clean, strongly-typed data payloads compiled during Stage 2 are piped directly into the localized relational database management layer (PostgreSQL schema). The staging engine triggers an atomic drop-and-rebuild script wrapper, completely overwriting the targeted operational fact tables (`fact_time_logs`, `fact_asset_checklists`, `fact_quick_tasks`) with zero manual interaction or data administration debt.
+
+#### 2. Referential Integrity & DirectQuery Tuning
+- **Primary/Foreign Key Constraints:** The incoming data stream is dynamically validated against the employee master directory table (`dim_employees`). Any out-of-bounds parameters or unknown personnel IDs automatically trip an intake verification alarm.
+- **Index Preservation:** Database indexes are structured on B-Tree index parameters (optimized for chronological boundaries and status strings), ensuring analytical rendering queries resolve instantaneously.
+
+---
+
+### STAGE 4: ADVANCED SEMANTIC MODEL CIRCUIT RESILIENCY
+
+#### 1. Dynamic Boundary Mapping
+The analytics semantic layout connects directly to the PostgreSQL database layer via optimized DirectQuery connections. To insulate downstream reports from structural field drift caused by front-end form reconfigurations, the advanced Power BI M-Query dataset uses a robust, fault-tolerant schema layer.
+
+#### 2. M-Query Circuit-Breaker Architecture
+Instead of utilizing fixed structural index numbers to load queries, column mappings are routed into a flexible meta-driven schema lookup array. Using `Record.FieldOrDefault` commands, the semantic engine parses each dataset at query execution time:
+- **Normal State:** If the database fields line up with model expectations, data is passed seamlessly to the visualization dashboards.
+- **Drift State:** If a column name is altered or missing, the query engine dynamically catches the modification, intercepts a complete system crash, inserts a default placeholder parameter, and preserves report uptime.
+
+---
+# END OF INTEGRATION PIPELINE SPECIFICATION DOCUMENT
