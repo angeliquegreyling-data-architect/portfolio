@@ -25,13 +25,13 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 
 ### INDEX OF ACTIVE ARCHITECTURAL SYSTEMS & REPOSITORIES
 
-1. System Design Log: [ADR-OPERATIONAL-TRIAGE-PIPELINE](ADR_OPERATIONAL_TRIAGE_PIPELINE.md)
+1. System Design Log: [ADR-OPERATIONAL-TRIAGE-PIPELINE](ADR_OPERATIONAL_TRIAGE_PIPELINE.md) [1.74]
     * *Core Architecture:* Comprehensive Technical Solutions Triage explaining the architectural constraints behind migrating regional transit logistics reporting layers off fragile APIs and webhooks into an automated asynchronous staging sandbox.
-2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md)
+2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md) [1.74]
     * *Core Architecture:* End-to-end client ingestion perimeter deploying multi-channel webhook receivers, text regex normalization matrices, and automated database upsert gates to prevent duplicate customer records.
-3. Technical Architecture Framework: [GOLDEN-ARROW-AUTOMATION-PIPELINE](GOLDEN_ARROW_AUTOMATION_PIPELINE.md)
+3. Technical Architecture Framework: [TRANSIT-METRICS-AUTOMATION-PIPELINE](TRANSIT_METRICS_AUTOMATION_PIPELINE.md) [1.74]
     * *Core Architecture:* Automated multi-layer data extraction pipeline integrating custom TypeScript/Office Scripts to handle structural spreadsheet data modifications, unmerge grid headers, and optimize data models for downstream Power BI semantic layer ingestion.
-4. Relational Schema Database Sandbox: [schema.sql](schema.sql)
+4. Relational Schema Database Sandbox: [schema.sql](schema.sql) [1.74]
     * *Core Architecture:* Enterprise-grade PostgreSQL data schema manifest demonstrating 3NF relational design, dimensional star-schema data modeling, composite foreign-key assignments, and database indexes optimized for performance tracking.
 
 
