@@ -39,6 +39,8 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
     * *Core Architecture:* Production monitoring array automating cross-platform incident tracking, ticketing distributions, and real-time operational status updates across remote team management channels.
 6. Relational Schema Database Sandbox: [schema.sql](schema.sql) [1.74]
     * *Core Architecture:* Enterprise-grade PostgreSQL data schema manifest demonstrating 3NF relational design, dimensional star-schema data modeling, composite foreign-key assignments, and database indexes optimized for performance tracking.
+    * *Interactive Sandbox Prototype:* [Launch Live ERD Explorer & SQL Query Analyzer Sandbox](https://github.io)
+    * *Source Code Implementation:* [Review Pure PostgreSQL Relational Schema Script Logic](schema.sql)
 
 ---
 
