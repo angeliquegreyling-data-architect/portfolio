@@ -29,12 +29,12 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
     * *Core Architecture:* Comprehensive Technical Solutions Triage explaining the architectural constraints behind migrating regional transit logistics reporting layers off fragile APIs and webhooks into an automated asynchronous staging sandbox.
 2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md) [1.74]
     * *Core Architecture:* End-to-end client ingestion perimeter deploying multi-channel webhook receivers, text regex normalization matrices, and automated database upsert gates to prevent duplicate customer records.
-3. Technical Architecture Framework: [TRANSIT-METRICS-AUTOMATION-PIPELINE](TRANSIT_METRICS_AUTOMATION_PIPELINE.md) [1.74]
+3. Multi-Platform Webhook Perimeter: [INTEGRATION-PIPELINE](INTEGRATION_PIPELINE.md)
+    * *Core Architecture:* Asynchronous workflow architecture processing cross-system telemetry, parsing structural schema variants, and managing cloud storage file handoffs across secure enterprise systems.
+4. Technical Architecture Framework: [TRANSIT-METRICS-AUTOMATION-PIPELINE](TRANSIT_METRICS_AUTOMATION_PIPELINE.md) [1.74]
     * *Core Architecture:* Automated multi-layer data extraction pipeline integrating custom TypeScript/Office Scripts to handle structural spreadsheet data modifications, unmerge grid headers, and optimize data models for downstream Power BI semantic layer ingestion.
     * *Interactive Sandbox Prototype:* [Launch Live Ingestion Sandbox & Real-Time Processing Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-data-ingestion-staging-sandbox-v2.html)
     * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](enterprise-data-ingestion-staging-sandbox-v2.html)
-4. Relational Schema Database Sandbox: [schema.sql](schema.sql) [1.74]
-    * *Core Architecture:* Enterprise-grade PostgreSQL data schema manifest demonstrating 3NF relational design, dimensional star-schema data modeling, composite foreign-key assignments, and database indexes optimized for performance tracking.
 5. Zero-Code Automation Matrix: [ZAPIER-PIPELINE](ZAPIER_PIPELINE.md)
     * *Core Architecture:* Production monitoring array automating cross-platform incident tracking, ticketing distributions, and real-time operational status updates across remote team management channels.
 6. Relational Schema Database Sandbox: [schema.sql](schema.sql) [1.74]
