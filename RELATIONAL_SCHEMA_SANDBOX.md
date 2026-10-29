@@ -42,7 +42,7 @@ To sustain lightning-fast calculation speeds under multi-million-row corporate r
 
 ## INTERACTIVE ECOSYSTEM DIRECTORY
 
-*   **Interactive Simulation Canvas:** [Launch Live ERD Explorer & SQL Query Analyzer Sandbox]([https://github.io](https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-database-erd-analyzer-sandbox.html)
+*   **Interactive Simulation Canvas:** [Launch Live ERD Explorer & SQL Query Analyzer Sandbox](https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-database-erd-analyzer-sandbox.html)
 *   **Production Source Code Implementation:** [Review Pure PostgreSQL Relational Schema Script Logic](schema.sql)
 
 ***
