@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f3f6f8" />
+  <meta name="description" content="An interactive enterprise procurement schema explorer and SQL query plan demonstration." />
+  <title>Enterprise Database ERD Explorer &amp; SQL Query Analyzer Sandbox</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { ink: '#2C3E50', teal: '#1A5F7A', canvas: '#F3F6F8' }, boxShadow: { panel: '0 12px 32px rgba(32, 55, 72, .07)' } } } };
+  </script>
+  <style>
+    :root { color-scheme: light; --teal:#1A5F7A; --ink:#2C3E50; --line:#dce5e9; }
+    * { box-sizing:border-box }
+    body { margin:0; background:#f3f6f8; color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif }
+    button,select { font:inherit }
+    .panel { background:#fff; border:1px solid #e3eaee; border-radius:18px; box-shadow:0 12px 32px rgba(32,55,72,.055) }
+    .table-card { transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease; border:1px solid #e1e8ec }
+    .table-card:hover { transform:translateY(-2px); box-shadow:0 12px 25px rgba(26,95,122,.10) }
+    .table-card.selected { border:2px solid var(--teal); box-shadow:0 0 0 4px rgba(26,95,122,.11),0 12px 24px rgba(26,95,122,.09) }
+    .connector { position:absolute; z-index:0; height:2px; background:linear-gradient(90deg,#1a5f7a,#64a9a8); transform-origin:left center; opacity:.56 }
+    .connector:after { content:""; position:absolute; right:-1px; top:-4px; border-left:8px solid #4c999a; border-top:5px solid transparent; border-bottom:5px solid transparent }
+    .code-scroll { scrollbar-width:thin; scrollbar-color:#526c7d #192632 }
+    pre { white-space:pre; tab-size:2 }
+    .spin { animation:rotate .75s linear infinite }
+    @keyframes rotate { to { transform:rotate(360deg) } }
+    .fade-in { animation:enter .32s ease both }
+    @keyframes enter { from { opacity:0;transform:translateY(7px) } to { opacity:1;transform:translateY(0) } }
+    .field-row + .field-row { border-top:1px solid #edf1f3 }
+    .break-safe { overflow-wrap:anywhere;word-break:normal }
+    @media(max-width:767px) { .connector { display:none } }
+    @media(prefers-reduced-motion:reduce) { *,*:before,*:after { animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important } }
+  </style>
+</head>
+<body class="antialiased">
+  <header class="border-b border-slate-200 bg-white/90">
+    <div class="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div class="flex items-center gap-3">
+        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1A5F7A] text-white shadow-md shadow-teal-900/15" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="5" rx="7.5" ry="3"/><path d="M4.5 5v7c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3V5M4.5 12v7c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-7M8 9h.01M8 16h.01"/></svg>
+        </div>
+        <div class="min-w-0"><p class="text-[11px] font-bold uppercase tracking-[.17em] text-teal">Data architecture lab</p><h1 class="break-safe text-xl font-bold tracking-tight text-ink sm:text-[22px]">Enterprise Database ERD Explorer <span class="text-slate-400">&amp;</span> SQL Query Analyzer Sandbox</h1></div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
+        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Procurement data model</span>
+        <span class="rounded-full bg-slate-100 px-3 py-2">PostgreSQL 16</span>
+        <span class="rounded-full bg-slate-100 px-3 py-2">3NF · Read-only sandbox</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1440px] space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+    <section class="grid gap-6 xl:grid-cols-[1.4fr_.85fr]" aria-labelledby="erd-title">
+      <div class="panel min-w-0 p-5 sm:p-6">
+        <div class="mb-5 flex flex-wrap items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.15em] text-teal">01 / Relational model</p><h2 id="erd-title" class="mt-1 text-xl font-bold text-ink">Interactive ERD entity explorer</h2><p class="mt-1 text-sm text-slate-500">Select an entity to inspect its keys, relationships and access paths.</p></div><span class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">Core procurement schema</span></div>
+        <div class="relative grid gap-4 md:grid-cols-3 md:gap-3" id="erdCanvas">
+          <div class="connector" id="linkA" aria-hidden="true"></div><div class="connector" id="linkB" aria-hidden="true"></div>
+          <button type="button" class="table-card selected relative z-10 min-w-0 rounded-xl bg-white p-4 text-left" data-table="Sourcing_Contracts" aria-pressed="true">
+            <div class="flex items-center justify-between gap-2"><span class="rounded-md bg-teal/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-teal">Parent</span><span class="text-xs text-slate-400">01</span></div><div class="mt-3 flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0 text-teal" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5h16v13H4zM8 9h8M8 12h8M8 15h4"/></svg><h3 class="break-safe text-sm font-bold text-ink">Sourcing_Contracts</h3></div><p class="mt-2 text-xs leading-5 text-slate-500">Framework terms, validity windows &amp; negotiated rates</p><div class="mt-4 flex flex-wrap gap-1.5"><span class="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">PK · UUID</span><span class="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">3 indexes</span></div>
+          </button>
+          <button type="button" class="table-card relative z-10 min-w-0 rounded-xl bg-white p-4 text-left" data-table="Material_Ledgers" aria-pressed="false">
+            <div class="flex items-center justify-between gap-2"><span class="rounded-md bg-blue-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-700">Transaction</span><span class="text-xs text-slate-400">02</span></div><div class="mt-3 flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5h16v13H4zM8 9h8M8 12h8M8 15h4"/></svg><h3 class="break-safe text-sm font-bold text-ink">Material_Ledgers</h3></div><p class="mt-2 text-xs leading-5 text-slate-500">Plant consumption, receipts &amp; turnaround costs</p><div class="mt-4 flex flex-wrap gap-1.5"><span class="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">PK · UUID</span><span class="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">4 indexes</span></div>
+          </button>
+          <button type="button" class="table-card relative z-10 min-w-0 rounded-xl bg-white p-4 text-left" data-table="Vendor_Invoices" aria-pressed="false">
+            <div class="flex items-center justify-between gap-2"><span class="rounded-md bg-emerald-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700">Transaction</span><span class="text-xs text-slate-400">03</span></div><div class="mt-3 flex items-center gap-2"><svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5.5h16v13H4zM8 9h8M8 12h8M8 15h4"/></svg><h3 class="break-safe text-sm font-bold text-ink">Vendor_Invoices</h3></div><p class="mt-2 text-xs leading-5 text-slate-500">Supplier billing, unit pricing &amp; payment status</p><div class="mt-4 flex flex-wrap gap-1.5"><span class="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">PK · UUID</span><span class="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">4 indexes</span></div>
+          </button>
+        </div>
+        <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-100 pt-4 text-xs text-slate-500"><span class="inline-flex items-center gap-2"><span class="font-bold text-teal">1</span><span class="h-px w-8 bg-teal"></span><span class="font-bold text-teal">N</span> One contract to many records</span><span>Connector arrows show parent → child</span></div>
+      </div>
+      <aside class="panel min-w-0 overflow-hidden" aria-labelledby="inspector-title">
+        <div class="bg-[#1A5F7A] px-5 py-5 text-white sm:px-6"><div class="flex items-center justify-between gap-3"><div><p class="text-[10px] font-bold uppercase tracking-[.17em] text-sky-100">Live selection</p><h2 id="inspector-title" class="mt-1 text-lg font-bold">Schema Metadata Inspector</h2></div><span class="rounded-lg bg-white/15 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wide">3NF</span></div><p id="inspectorSubtitle" class="mt-1 break-safe text-sm text-sky-100">Sourcing_Contracts · contract master</p></div>
+        <div class="p-5 sm:p-6" id="metadata" aria-live="polite"></div>
+      </aside>
+    </section>
+
+    <section class="panel min-w-0 p-5 sm:p-6" aria-labelledby="analyzer-title">
+      <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.15em] text-teal">02 / Query workbench</p><h2 id="analyzer-title" class="mt-1 text-xl font-bold text-ink">Live mock SQL query analyzer</h2><p class="mt-1 text-sm text-slate-500">Explore a business question, inspect its SQL, then run a simulated plan.</p></div><span class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Sandbox ready</span></div>
+      <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.65fr)]">
+        <div class="min-w-0"><label for="scenario" class="mb-2 block text-sm font-semibold text-ink">Select Business Problem Statement to Analyze</label><div class="relative"><select id="scenario" class="w-full appearance-none rounded-xl border border-slate-300 bg-white px-4 py-3 pr-10 text-sm font-medium leading-6 text-slate-700 outline-none transition focus:border-teal focus:ring-4 focus:ring-teal/10"><option value="leakage">Scenario A · Calculate total off-contract leakage vs active framework agreements</option><option value="turnaround">Scenario B · Identify cost-variance bottlenecks across major plant turnarounds</option><option value="escalation">Scenario C · Audit vendor pricing escalations against raw material benchmarks</option></select><svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></svg></div><div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-[10px] font-bold uppercase tracking-[.15em] text-slate-500">Execution scope</p><div class="mt-3 space-y-2 text-xs"><div class="flex justify-between gap-3"><span class="text-slate-500">Window</span><span class="font-semibold text-slate-700">Last 90 days</span></div><div class="flex justify-between gap-3"><span class="text-slate-500">Records scanned</span><span class="font-semibold text-slate-700">12.8M (estimated)</span></div><div class="flex justify-between gap-3"><span class="text-slate-500">Mode</span><span class="font-semibold text-emerald-700">Plan simulation</span></div></div></div><button id="runQuery" type="button" class="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#1A5F7A] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-teal-900/15 transition hover:bg-[#164e65] focus:outline-none focus:ring-4 focus:ring-teal/25 disabled:cursor-wait disabled:opacity-80"><svg id="buttonIcon" viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor"><path d="M8 5.5a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 8 16.1V5.5Z"/></svg><span id="buttonLabel">⚡ Run Query &amp; Explain Plan</span></button><p class="mt-2 text-center text-[11px] text-slate-400">Simulated results · No database connection required</p></div>
+        <div class="min-w-0 overflow-hidden rounded-xl border border-[#233340] bg-[#17232d] shadow-inner"><div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 px-4 py-3"><div class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-400"></span><span class="h-2.5 w-2.5 rounded-full bg-amber-300"></span><span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span><span class="ml-2 text-xs font-semibold text-slate-300">query.sql</span></div><span class="rounded bg-white/10 px-2 py-1 text-[10px] font-bold tracking-wide text-sky-200">POSTGRESQL</span></div><div class="code-scroll max-h-[330px] min-h-[290px] overflow-auto p-4 sm:p-5"><pre id="sqlQuery" class="text-[12px] leading-[1.75] text-slate-200 sm:text-[13px]" aria-label="Read-only PostgreSQL query"></pre></div><div class="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-2.5 text-[10px] text-slate-400"><span>Read-only preview</span><span class="font-mono text-emerald-300">● syntax validated</span></div></div>
+      </div>
+    </section>
+
+    <section id="analysisOutput" class="hidden grid gap-6 lg:grid-cols-[1.4fr_.85fr]" aria-live="polite" aria-busy="false">
+      <div class="panel min-w-0 p-5 sm:p-6"><div class="flex flex-wrap items-center justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.15em] text-teal">03 / Result set</p><h2 class="mt-1 text-lg font-bold text-ink">Query results</h2></div><span id="resultCount" class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600"></span></div><div id="resultsTable" class="mt-4 min-w-0 overflow-x-auto"></div></div>
+      <aside class="panel min-w-0 overflow-hidden"><div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6"><div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18h16M6 15V9m4 6V5m4 10v-4m4 4V7"/><path d="m5 7 5-3 4 4 5-3"/></svg></div><div><p class="text-[10px] font-bold uppercase tracking-[.15em] text-emerald-700">Plan analysis</p><h2 class="font-bold text-ink">Query Optimizer Diagnostic</h2></div></div><div id="diagnostics" class="p-5 sm:p-6"></div></aside>
+    </section>
+
+    <footer class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-6"><div><p class="text-xs font-bold uppercase tracking-[.14em] text-teal">Enterprise Database ERD Explorer &amp; SQL Query Analyzer Sandbox</p><p class="mt-1 text-xs text-slate-500">Portfolio prototype · Procurement data model · Version 1.0</p></div><p class="mt-3 shrink-0 text-xs font-medium text-slate-500 sm:mt-0">Schema Explorer <span class="mx-1.5 text-slate-300">·</span> Page 1 of 1</p></footer>
+  </main>
+  <script>
+    const schema = {
+      Sourcing_Contracts: {
+        subtitle:'contract master', description:'Authoritative framework agreement and negotiated commercial terms.',
+        pk:'(contract_uuid)', keyType:'UUID', fields:[['contract_uuid','UUID · PK'],['vendor_uuid','UUID · FK'],['valid_from','TIMESTAMPTZ'],['valid_to','TIMESTAMPTZ'],['contract_status','VARCHAR(24)']],
+        fks:[['vendor_uuid','Vendors.vendor_uuid']], indexes:['idx_contract_uuid (contract_uuid)','idx_contract_vendor_status (vendor_uuid, contract_status)','idx_contract_validity (valid_from, valid_to)']
+      },
+      Material_Ledgers: {
+        subtitle:'material movement ledger', description:'Append-oriented operational records for plant material movements and costs.',
+        pk:'(ledger_uuid)', keyType:'UUID', fields:[['ledger_uuid','UUID · PK'],['contract_uuid','UUID · FK'],['plant_code','VARCHAR(12)'],['posted_at','TIMESTAMPTZ'],['extended_cost','NUMERIC(14,2)']],
+        fks:[['contract_uuid','Sourcing_Contracts.contract_uuid']], indexes:['idx_ledger_uuid (ledger_uuid)','idx_ledger_contract_posted (contract_uuid, posted_at DESC)','idx_ledger_plant_posted (plant_code, posted_at)','idx_ledger_material (material_sku)']
+      },
+      Vendor_Invoices: {
+        subtitle:'vendor invoice fact', description:'Invoice line-level billing facts linked to suppliers, contracts and materials.',
+        pk:'(invoice_uuid, line_no)', keyType:'UUID + SMALLINT', fields:[['invoice_uuid','UUID · PK'],['line_no','SMALLINT · PK'],['contract_uuid','UUID · FK'],['invoice_date','TIMESTAMPTZ'],['unit_price','NUMERIC(12,4)']],
+        fks:[['contract_uuid','Sourcing_Contracts.contract_uuid']], indexes:['idx_invoice_pk (invoice_uuid, line_no)','idx_invoice_contract_date (contract_uuid, invoice_date)','idx_invoice_vendor_date (vendor_uuid, invoice_date)','idx_invoice_material_date (material_sku, invoice_date)']
+      }
+    };
+    const scenarios = {
+      leakage:{ sql:`-- Scenario A · Off-contract leakage vs active frameworks
+SELECT
+    l.plant_code,
+    COUNT(DISTINCT l.ledger_uuid) AS purchase_lines,
+    SUM(l.extended_cost) AS total_spend,
+    SUM(CASE WHEN c.contract_uuid IS NULL
+             THEN l.extended_cost ELSE 0 END) AS leakage_spend,
+    ROUND(100.0 * SUM(CASE WHEN c.contract_uuid IS NULL
+             THEN l.extended_cost ELSE 0 END)
+          / NULLIF(SUM(l.extended_cost), 0), 2) AS leakage_pct
+FROM Material_Ledgers AS l
+LEFT JOIN Sourcing_Contracts AS c
+    ON c.contract_uuid = l.contract_uuid
+   AND c.contract_status = 'ACTIVE'
+   AND l.posted_at >= c.valid_from
+   AND l.posted_at < c.valid_to
+WHERE l.posted_at >= CURRENT_TIMESTAMP - INTERVAL '90 days'
+GROUP BY l.plant_code
+ORDER BY leakage_spend DESC;`,
+        headers:['Plant','Purchase lines','Total spend','Leakage spend','Leakage %'],rows:[['Plant 04','8,421','$4,820,440','$312,680','6.49%'],['Plant 12','6,095','$3,174,920','$184,210','5.80%'],['Plant 07','5,770','$2,940,100','$96,400','3.28%']], count:'3 plants · 20,286 purchase lines', speed:'0.04ms', index:'Index Scan using idx_contract_uuid on Sourcing_Contracts', note:'The contract UUID lookup resolves each ledger reference through the primary-key index. The composite contract status and validity indexes narrow eligible agreements before aggregation, avoiding a full framework-table scan.'},
+        turnaround:{ sql:`-- Scenario B · Turnaround cost variance by plant
+SELECT
+    l.plant_code,
+    DATE_TRUNC('month', l.posted_at) AS turnaround_month,
+    COUNT(DISTINCT l.material_sku) AS material_count,
+    SUM(l.quantity * l.baseline_unit_cost) AS baseline_cost,
+    SUM(l.extended_cost) AS actual_cost,
+    SUM(l.extended_cost -
+        (l.quantity * l.baseline_unit_cost)) AS variance
+FROM Material_Ledgers AS l
+INNER JOIN Sourcing_Contracts AS c
+    ON c.contract_uuid = l.contract_uuid
+   AND c.contract_status = 'ACTIVE'
+WHERE l.is_turnaround = TRUE
+  AND l.posted_at >= CURRENT_TIMESTAMP - INTERVAL '90 days'
+GROUP BY l.plant_code, DATE_TRUNC('month', l.posted_at)
+ORDER BY variance DESC;`,
+        headers:['Plant / month','Materials','Baseline cost','Actual cost','Variance'],rows:[['Plant 04 · Oct','186','$1,240,000','$1,398,600','+$158,600'],['Plant 12 · Oct','143','$980,400','$1,071,220','+$90,820'],['Plant 07 · Sep','121','$840,000','$881,450','+$41,450']], count:'3 turnaround cohorts · 450 materials', speed:'0.07ms', index:'Index Scan using idx_ledger_plant_posted on Material_Ledgers', note:'The plant and posting-time composite index constrains the turnaround window first. Contract UUID joins use the referenced primary key, so only qualifying ledger rows reach the grouped cost calculation.'},
+        escalation:{ sql:`-- Scenario C · Vendor price escalation vs benchmark
+SELECT
+    i.vendor_uuid,
+    i.material_sku,
+    COUNT(*) AS invoice_lines,
+    AVG(i.unit_price) AS current_unit_price,
+    AVG(b.benchmark_unit_price) AS benchmark_price,
+    ROUND(100.0 * (AVG(i.unit_price)
+        - AVG(b.benchmark_unit_price))
+        / NULLIF(AVG(b.benchmark_unit_price), 0), 2)
+        AS escalation_pct
+FROM Vendor_Invoices AS i
+INNER JOIN Material_Ledgers AS l
+    ON l.material_sku = i.material_sku
+INNER JOIN Sourcing_Contracts AS c
+    ON c.contract_uuid = i.contract_uuid
+   AND c.contract_status = 'ACTIVE'
+INNER JOIN Material_Benchmarks AS b
+    ON b.material_sku = i.material_sku
+   AND b.effective_at <= i.invoice_date
+WHERE i.invoice_date >= CURRENT_TIMESTAMP - INTERVAL '90 days'
+GROUP BY i.vendor_uuid, i.material_sku
+HAVING AVG(i.unit_price) > AVG(b.benchmark_unit_price) * 1.05
+ORDER BY escalation_pct DESC;`,
+        headers:['Vendor','Material','Invoice lines','Current avg.','Benchmark','Escalation'],rows:[['V-1042','VALVE-8IN','126','$842.50','$760.00','10.86%'],['V-2087','GASKET-SS','94','$118.40','$109.00','8.62%'],['V-0318','BEARING-XL','61','$2,410.00','$2,250.00','7.11%']], count:'3 flagged pairs · 281 invoice lines', speed:'0.09ms', index:'Index Scan using idx_invoice_material_date on Vendor_Invoices', note:'Material and invoice-date keys bound the invoice range scan. The contract and benchmark joins use UUID and material keys, respectively, keeping the escalation comparison index-backed before the 5% threshold is applied.'}
+    };
+    const sqlEl=document.getElementById('sqlQuery'), scenarioEl=document.getElementById('scenario');
+    function renderSql(){sqlEl.textContent=scenarios[scenarioEl.value].sql}
+    function renderMetadata(name){
+      const d=schema[name]; document.getElementById('inspectorSubtitle').textContent=`${name} · ${d.subtitle}`;
+      const fieldRows=d.fields.map(([field,type])=>`<div class="field-row grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-2.5 text-xs"><code class="break-safe font-semibold text-slate-700">${field}</code><span class="break-safe text-right font-mono text-[10px] text-slate-500">${type}</span></div>`).join('');
+      const fkRows=d.fks.map(([field,target])=>`<li class="break-safe flex flex-wrap items-center gap-1.5 py-1.5 text-xs"><code class="font-semibold text-slate-700">${field}</code><span class="text-slate-400">→</span><code class="text-teal">${target}</code></li>`).join('');
+      const idxRows=d.indexes.map(index=>`<li class="break-safe rounded-lg bg-slate-50 px-3 py-2 font-mono text-[10px] leading-4 text-slate-600">${index}</li>`).join('');
+      document.getElementById('metadata').innerHTML=`<p class="break-safe text-xs leading-5 text-slate-500">${d.description}</p><div class="mt-4 rounded-xl border border-slate-200"><div class="flex items-center justify-between gap-2 border-b border-slate-100 bg-slate-50 px-3 py-2.5"><span class="text-[10px] font-bold uppercase tracking-[.13em] text-slate-500">Columns &amp; types</span><span class="rounded bg-blue-100 px-2 py-1 text-[10px] font-bold text-blue-700">PK ${d.pk}</span></div><div class="px-3">${fieldRows}</div></div><div class="mt-4"><h3 class="text-[10px] font-bold uppercase tracking-[.13em] text-slate-500">Foreign key constraints</h3><ul class="mt-1">${fkRows}</ul></div><div class="mt-3"><h3 class="text-[10px] font-bold uppercase tracking-[.13em] text-slate-500">Performance indexes</h3><ul class="mt-2 space-y-1.5">${idxRows}</ul></div>`;
+    }
+    function positionLinks(){
+      if(innerWidth<768)return;
+      const canvas=document.getElementById('erdCanvas'),cards=[...canvas.querySelectorAll('.table-card')],rect=canvas.getBoundingClientRect();
+      const a=cards[0].getBoundingClientRect(),b=cards[1].getBoundingClientRect(),c=cards[2].getBoundingClientRect();
+      for(const [id,target] of [['linkA',b],['linkB',c]]){const el=document.getElementById(id),x=a.right-rect.left,y=a.top+a.height/2-rect.top,tx=target.left-rect.left,ty=target.top+target.height/2-rect.top,dx=tx-x,dy=ty-y;el.style.left=x+'px';el.style.top=y+'px';el.style.width=Math.sqrt(dx*dx+dy*dy)+'px';el.style.transform=`rotate(${Math.atan2(dy,dx)}rad)`}
+    }
+    document.querySelectorAll('.table-card').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.table-card').forEach(card=>{const selected=card===button;card.classList.toggle('selected',selected);card.setAttribute('aria-pressed',String(selected))});renderMetadata(button.dataset.table)}));
+    scenarioEl.addEventListener('change',renderSql);
+    const formatCell=(value,header)=>`<td class="break-safe px-3 py-3 text-xs ${header?'font-semibold text-slate-700':'text-slate-600'}">${value}</td>`;
+    function renderResult(key){const d=scenarios[key];document.getElementById('resultCount').textContent=d.count;document.getElementById('resultsTable').innerHTML=`<table class="w-full min-w-[620px] border-separate border-spacing-0 text-left"><thead><tr>${d.headers.map(h=>`<th scope="col" class="border-b border-slate-200 bg-slate-50 px-3 py-3 text-[10px] font-bold uppercase tracking-wide text-slate-500">${h}</th>`).join('')}</tr></thead><tbody>${d.rows.map((row,i)=>`<tr class="${i%2?'bg-slate-50/60':''}">${row.map((cell,j)=>formatCell(cell,j===0)).join('')}</tr>`).join('')}</tbody></table>`;document.getElementById('diagnostics').innerHTML=`<div class="flex items-end justify-between gap-3"><div><p class="text-xs font-medium text-slate-500">Estimated execution time</p><p class="mt-1 text-3xl font-bold tracking-tight text-emerald-700">${d.speed}</p></div><span class="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-[10px] font-bold text-emerald-700">OPTIMIZED</span></div><div class="mt-4 rounded-xl border border-blue-100 bg-blue-50/70 p-3"><p class="text-[10px] font-bold uppercase tracking-[.12em] text-blue-800">Access path</p><p class="mt-1.5 break-safe font-mono text-[11px] leading-5 text-slate-700">${d.index}</p></div><div class="mt-4"><h3 class="text-xs font-bold text-ink">Why this plan performs</h3><p class="mt-1.5 break-safe text-xs leading-5 text-slate-500">${d.note}</p></div><div class="mt-4 grid grid-cols-2 gap-2"><div class="rounded-lg bg-slate-50 p-3"><p class="text-[10px] text-slate-500">Join strategy</p><p class="mt-1 text-xs font-semibold text-slate-700">Nested loop · indexed</p></div><div class="rounded-lg bg-slate-50 p-3"><p class="text-[10px] text-slate-500">Rows returned</p><p class="mt-1 text-xs font-semibold text-slate-700">${d.rows.length} grouped records</p></div></div>`}
+    document.getElementById('runQuery').addEventListener('click',function(){const btn=this,output=document.getElementById('analysisOutput'),icon=document.getElementById('buttonIcon'),label=document.getElementById('buttonLabel');btn.disabled=true;output.classList.remove('hidden');output.classList.add('grid');output.setAttribute('aria-busy','true');output.innerHTML=`<div class="panel col-span-full flex min-h-44 items-center justify-center gap-3 p-6 text-sm font-semibold text-slate-600"><svg class="spin h-6 w-6 text-teal" viewBox="0 0 24 24" fill="none"><circle class="opacity-20" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>Running simulated query and building execution plan…</div>`;icon.innerHTML='<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="3" opacity=".3"/><path d="M20 12a8 8 0 0 0-8-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';icon.classList.add('spin');label.textContent='Analyzing…';setTimeout(()=>{output.classList.remove('hidden');output.classList.add('grid');output.innerHTML='<div class="panel min-w-0 p-5 sm:p-6"><div class="flex flex-wrap items-center justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.15em] text-teal">03 / Result set</p><h2 class="mt-1 text-lg font-bold text-ink">Query results</h2></div><span id="resultCount" class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600"></span></div><div id="resultsTable" class="mt-4 min-w-0 overflow-x-auto"></div></div><aside class="panel min-w-0 overflow-hidden"><div class="flex items-center gap-3 border-b border-slate-100 px-5 py-4 sm:px-6"><div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">↗</div><div><p class="text-[10px] font-bold uppercase tracking-[.15em] text-emerald-700">Plan analysis</p><h2 class="font-bold text-ink">Query Optimizer Diagnostic</h2></div></div><div id="diagnostics" class="p-5 sm:p-6"></div></aside>';renderResult(scenarioEl.value);output.setAttribute('aria-busy','false');output.classList.add('fade-in');icon.classList.remove('spin');icon.innerHTML='<path d="M8 5.5a1 1 0 0 1 1.5-.87l9.2 5.3a1 1 0 0 1 0 1.74l-9.2 5.3A1 1 0 0 1 8 16.1V5.5Z"/>';label.textContent='⚡ Run Query & Explain Plan';btn.disabled=false;},950)});
+    renderMetadata('Sourcing_Contracts');renderSql();requestAnimationFrame(positionLinks);window.addEventListener('resize',()=>requestAnimationFrame(positionLinks));
+  </script>
+</body>
+</html>
+
+
