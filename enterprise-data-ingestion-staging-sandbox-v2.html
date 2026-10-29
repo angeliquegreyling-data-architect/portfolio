@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1A5F7A">
+  <title>Enterprise Data Ingestion Staging Sandbox &amp; Pipeline Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { ink: '#2C3E50', teal: '#1A5F7A', mist: '#F3F6F8', violet: '#7658A6' }, boxShadow: { card: '0 8px 28px rgba(36,56,72,.07)' } } } };
+  </script>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { background: #f3f6f8; color: #2c3e50; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .table-scroll { overflow-x: auto; }
+    .data-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 760px; }
+    .data-table th { background: #f5f8fa; color: #607383; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .data-table td, .data-table th { padding: .82rem 1rem; text-align: left; border-bottom: 1px solid #e8eef1; vertical-align: top; }
+    .data-table tbody tr:nth-child(even) { background: #fafcfd; }
+    .data-table tbody tr:hover { background: #f0f7f9; }
+    .wrap { overflow-wrap: anywhere; word-break: break-word; }
+    .step-active { border-color: #1a5f7a !important; background: #edf7fa !important; color: #1a5f7a; }
+    .step-done { border-color: #22a06b !important; background: #effaf4 !important; color: #147a50; }
+    .pulse-dot { animation: pulse 1.25s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <div class="flex min-w-0 items-center gap-3">
+        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-teal text-white shadow-sm" aria-hidden="true">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18" cy="17" r="2.5"/></svg>
+        </div>
+        <div class="min-w-0"><p class="truncate text-sm font-bold tracking-tight text-ink">Northstar <span class="font-medium text-slate-400">/ Data Operations</span></p><p class="text-xs text-slate-500">Ingestion control plane</p></div>
+      </div>
+      <div class="flex shrink-0 items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700"><span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span></span><span>Systems operational</span></div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8 lg:py-10">
+    <section class="mb-7 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+      <div class="max-w-3xl"><div class="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600"><span class="h-1.5 w-1.5 rounded-full bg-violet-500"></span>STAGING SANDBOX <span class="text-slate-300">/</span> PIPELINE HUB</div><h1 class="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Enterprise Data Ingestion<br class="hidden sm:block"> Staging Sandbox &amp; Pipeline Hub</h1><p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">See how incoming maintenance records are normalized, validated, and protected before they reach production systems.</p></div>
+      <div class="grid grid-cols-2 gap-3 sm:min-w-[340px]"><div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card"><p class="text-xs font-medium text-slate-500">Daily volume</p><p class="mt-1 text-2xl font-bold text-ink">400 <span class="text-sm font-medium text-slate-500">units</span></p></div><div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card"><p class="text-xs font-medium text-slate-500">Pipeline latency</p><p class="mt-1 text-2xl font-bold text-ink">&lt; 2 <span class="text-sm font-medium text-slate-500">sec</span></p></div></div>
+    </section>
+
+    <section class="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,.85fr)]">
+      <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+        <div class="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-5 py-5 sm:px-6"><div><p class="text-xs font-bold uppercase tracking-[.14em] text-teal">01 / Live intake payload</p><h2 class="mt-1 text-lg font-bold text-ink">Incoming record builder</h2><p class="mt-1 text-sm text-slate-500">Load a sample or edit the fields to model a live vendor feed.</p></div><span id="payloadBadge" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Awaiting payload</span></div>
+        <div class="space-y-5 p-5 sm:p-6">
+          <label class="block"><span class="mb-1.5 block text-xs font-semibold text-slate-600">Muddled data payload</span><select id="preset" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-ink outline-none transition focus:border-teal focus:ring-2 focus:ring-teal/15"><option value="row7">Row 7 · Blank email leak</option><option value="row8">Row 8 · Clean production pass</option><option value="row9">Row 9 · Bad phone format</option><option value="custom">Custom · Current field values</option></select></label>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block"><span class="mb-1.5 block text-xs font-semibold text-slate-600">Tenant phone</span><input id="phone" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/15" value="(312) 555-0188 ext 4" autocomplete="off"></label>
+            <label class="block"><span class="mb-1.5 block text-xs font-semibold text-slate-600">Vendor email <span class="text-rose-500">*</span></span><input id="email" type="email" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/15" value="dispatch@northstar-maint.com" autocomplete="off"></label>
+            <label class="block sm:col-span-2"><span class="mb-1.5 block text-xs font-semibold text-slate-600">Property address</span><input id="address" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/15" value="1840 W Addison St, Chicago, IL 60613" autocomplete="off"></label>
+            <label class="block"><span class="mb-1.5 block text-xs font-semibold text-slate-600">Status</span><select id="status" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/15"><option>Scheduled</option><option>In Progress</option><option>Awaiting Parts</option><option>Urgent</option></select></label>
+            <label class="block"><span class="mb-1.5 block text-xs font-semibold text-slate-600">Key access codes <span class="font-normal text-slate-400">(stripped before dispatch)</span></span><input id="keys" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-teal focus:ring-2 focus:ring-teal/15" value="LOBBY-4821; UNIT-19B" autocomplete="off"></label>
+          </div>
+          <div class="flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between"><p class="text-xs leading-5 text-slate-500">Required gate: vendor email must be present and valid before dispatch.</p><button id="runBtn" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal px-6 py-3 text-sm font-bold text-white shadow-md shadow-teal/20 transition hover:-translate-y-0.5 hover:bg-[#154f66] focus:outline-none focus:ring-4 focus:ring-teal/20 disabled:cursor-wait disabled:opacity-70"><span aria-hidden="true">⚡</span><span>Run Pipeline Simulation</span></button></div>
+        </div>
+      </article>
+
+      <aside class="space-y-5">
+        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card sm:p-6"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.14em] text-violet">02 / Automated sanitization engine</p><h2 class="mt-1 text-lg font-bold text-ink">Processing route</h2></div><span id="engineState" class="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet">Standby</span></div>
+          <div class="mt-5 space-y-3" id="steps">
+            <div data-step="0" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-slate-500 shadow-sm">01</span><div class="min-w-0 flex-1"><p class="text-sm font-semibold">Intake payload</p><p class="text-xs text-slate-500">Capture vendor stream</p></div><span class="step-icon text-xs text-slate-400">Queued</span></div>
+            <div data-step="1" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-slate-500 shadow-sm">02</span><div class="min-w-0 flex-1"><p class="text-sm font-semibold">Normalize &amp; translate</p><p class="text-xs text-slate-500">Phone format · America/Chicago</p></div><span class="step-icon text-xs text-slate-400">Queued</span></div>
+            <div data-step="2" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-slate-500 shadow-sm">03</span><div class="min-w-0 flex-1"><p class="text-sm font-semibold">Validation perimeter</p><p class="text-xs text-slate-500">Required fields · privacy filter</p></div><span class="step-icon text-xs text-slate-400">Queued</span></div>
+            <div data-step="3" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3.5"><span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-sm font-bold text-slate-500 shadow-sm">04</span><div class="min-w-0 flex-1"><p class="text-sm font-semibold">Target dispatch</p><p class="text-xs text-slate-500">Write clean record to ledger</p></div><span class="step-icon text-xs text-slate-400">Queued</span></div>
+          </div><div id="activity" class="mt-4 rounded-xl bg-slate-900 px-4 py-3 text-xs leading-5 text-slate-200"><span class="mr-2 text-emerald-400">●</span><span>Pipeline ready. Waiting for a payload.</span></div>
+        </article>
+        <article id="reviewCard" class="rounded-2xl border border-amber-200 bg-amber-50/70 p-5 shadow-card sm:p-6"><div class="flex items-center justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.14em] text-amber-700">Exception handling</p><h2 class="mt-1 text-lg font-bold text-ink">Needs Office Review</h2></div><span id="reviewCount" class="grid h-8 min-w-8 place-items-center rounded-full bg-white px-2 text-sm font-bold text-amber-700">0</span></div><div id="reviewList" class="mt-3 space-y-2"><p class="rounded-lg border border-amber-100 bg-white/75 p-3 text-xs text-slate-500">No records awaiting review.</p></div></article>
+      </aside>
+    </section>
+
+    <section class="mt-7 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
+      <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:px-6"><div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><p class="text-xs font-bold uppercase tracking-[.14em] text-teal">03 / Live data ledgers</p><h2 class="mt-1 text-xl font-bold text-ink">Pipeline records</h2><p class="mt-1 text-sm text-slate-500">State updates as records enter, pass, or fail the perimeter gates.</p></div><span class="text-xs text-slate-500">Last activity: <time id="lastActivity">—</time></span></div>
+        <div role="tablist" aria-label="Pipeline record ledgers" class="flex flex-wrap gap-2"><button role="tab" aria-selected="true" aria-controls="panel-queue" id="tab-queue" class="ledger-tab rounded-lg bg-teal px-4 py-2.5 text-sm font-semibold text-white" data-panel="queue">Active Ingestion Queue <span id="queueCount" class="ml-1 rounded-full bg-white/20 px-1.5 py-0.5 text-xs">3</span></button><button role="tab" aria-selected="false" aria-controls="panel-dispatched" id="tab-dispatched" class="ledger-tab rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200" data-panel="dispatched">Dispatched &amp; Synced Jobs <span id="dispatchedCount" class="ml-1 rounded-full bg-white px-1.5 py-0.5 text-xs">2</span></button><button role="tab" aria-selected="false" aria-controls="panel-errors" id="tab-errors" class="ledger-tab rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200" data-panel="errors">System Error Ledger <span id="errorCount" class="ml-1 rounded-full bg-white px-1.5 py-0.5 text-xs">0</span></button></div></div>
+      <div id="panel-queue" role="tabpanel" aria-labelledby="tab-queue" class="ledger-panel"><div class="table-scroll"><table class="data-table"><thead><tr><th>Tracking ID</th><th>Unit / Address</th><th>Tenant phone</th><th>Vendor email</th><th>Received</th><th>Stage</th></tr></thead><tbody id="queueBody"></tbody></table></div></div>
+      <div id="panel-dispatched" role="tabpanel" aria-labelledby="tab-dispatched" class="ledger-panel hidden"><div class="table-scroll"><table class="data-table"><thead><tr><th>Tracking ID</th><th>Unit / Address</th><th>Phone normalized</th><th>Vendor</th><th>Dallas time</th><th>Status</th><th>Access key</th></tr></thead><tbody id="dispatchedBody"></tbody></table></div></div>
+      <div id="panel-errors" role="tabpanel" aria-labelledby="tab-errors" class="ledger-panel hidden"><div class="table-scroll"><table class="data-table"><thead><tr><th>Tracking ID</th><th>Received</th><th>Failed gate</th><th>Exception detail</th><th>Route</th></tr></thead><tbody id="errorsBody"></tbody></table></div></div>
+    </section>
+
+    <section class="mt-6 grid gap-4 md:grid-cols-3"><div class="flex gap-3 rounded-xl border border-slate-200 bg-white p-4"><span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-teal/10 text-teal">↔</span><div><h3 class="text-sm font-bold">Timezone normalization</h3><p class="mt-1 text-xs leading-5 text-slate-500">Timestamps are rendered for America/Chicago, including daylight saving changes.</p></div></div><div class="flex gap-3 rounded-xl border border-slate-200 bg-white p-4"><span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-700">✓</span><div><h3 class="text-sm font-bold">Defensive validation</h3><p class="mt-1 text-xs leading-5 text-slate-500">Required field checks stop incomplete records before they reach the target.</p></div></div><div class="flex gap-3 rounded-xl border border-slate-200 bg-white p-4"><span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-violet-50 text-violet">⌁</span><div><h3 class="text-sm font-bold">Sensitive data protection</h3><p class="mt-1 text-xs leading-5 text-slate-500">Key access codes remain in staging and are omitted from dispatched records.</p></div></div></section>
+
+    <footer class="mt-8 rounded-xl border border-slate-200 bg-white px-5 py-4 text-center text-xs leading-5 text-slate-500">This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</footer>
+    <p class="pb-8 pt-3 text-center text-[11px] text-slate-400">Enterprise Data Ingestion Staging Sandbox <span class="mx-1">·</span> Portfolio Prototype <span class="mx-1">·</span> v1.0</p>
+  </main>
+
+  <div id="toast" class="pointer-events-none fixed bottom-5 right-5 z-50 hidden max-w-sm rounded-xl border px-4 py-3 text-sm font-semibold shadow-xl" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const $ = (id) => document.getElementById(id);
+      const nowISO = () => new Date().toISOString();
+      // dateStyle/timeStyle cannot be combined with timeZoneName in every browser.
+      const chicagoTime = (date) => new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(new Date(date));
+      const shortTime = (date) => new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(date));
+      const state = {
+        queue: [
+          { id: 'NS-2026-00401', address: '1840 W Addison St · Unit 19B', phone: '(312) 555-0188', email: 'dispatch@northstar-maint.com', received: new Date(Date.now() - 6 * 60000).toISOString(), status: 'In staging' },
+          { id: 'NS-2026-00402', address: '725 N Dearborn St · Unit 08A', phone: '+1 773.555.0142', email: 'ops@lakefront-service.io', received: new Date(Date.now() - 3 * 60000).toISOString(), status: 'In staging' },
+          { id: 'NS-2026-00403', address: '4100 N Marine Dr · Unit 12C', phone: '773-555-0199', email: 'field@citygrid-maint.com', received: nowISO(), status: 'In staging' }
+        ],
+        dispatched: [
+          { id: 'NS-2026-00398', address: '920 W Randolph St · Unit 05D', phone: '+13125550123', email: 'dispatch@northstar-maint.com', time: new Date(Date.now() - 33 * 60000).toISOString(), status: 'Scheduled', key: 'Stripped' },
+          { id: 'NS-2026-00399', address: '1520 S Michigan Ave · Unit 21F', phone: '+17735550176', email: 'ops@lakefront-service.io', time: new Date(Date.now() - 18 * 60000).toISOString(), status: 'In Progress', key: 'Stripped' }
+        ], errors: [], reviews: [], counter: 404
+      };
+      const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+      const tracking = () => `NS-${new Date().getFullYear()}-${String(state.counter++).padStart(5, '0')}`;
+      const phoneNormalize = (value) => {
+        // Drop a human-entered extension before flattening the number.
+        const mainNumber = String(value || '').replace(/\s*(?:ext\.?|x|#)\s*\d+\s*$/i, '');
+        const digits = mainNumber.replace(/\D/g, '');
+        if (!digits) return { value: '', ok: false };
+        const national = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
+        if (national.length !== 10) return { value: `+${digits}`, ok: false };
+        return { value: `+1${national}`, ok: true };
+      };
+      function paint() {
+        $('queueBody').innerHTML = state.queue.length ? state.queue.map(r => `<tr><td class="mono text-xs font-semibold text-teal">${escapeHTML(r.id)}</td><td class="wrap text-sm font-medium text-ink">${escapeHTML(r.address)}</td><td class="mono text-xs">${escapeHTML(r.phone || '—')}</td><td class="wrap text-sm">${escapeHTML(r.email || '—')}</td><td class="text-xs text-slate-500">${escapeHTML(chicagoTime(r.received))}</td><td><span class="rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">${escapeHTML(r.status)}</span></td></tr>`).join('') : emptyRow(6, 'No records currently in the intake queue.');
+        $('dispatchedBody').innerHTML = state.dispatched.length ? state.dispatched.map(r => `<tr><td class="mono text-xs font-semibold text-teal">${escapeHTML(r.id)}</td><td class="wrap text-sm font-medium">${escapeHTML(r.address)}</td><td class="mono text-xs text-emerald-700">${escapeHTML(r.phone)}</td><td class="wrap text-sm">${escapeHTML(r.email)}</td><td class="text-xs">${escapeHTML(chicagoTime(r.time))}</td><td><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">${escapeHTML(r.status)}</span></td><td><span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">${escapeHTML(r.key)}</span></td></tr>`).join('') : emptyRow(7, 'No jobs have passed dispatch yet.');
+        $('errorsBody').innerHTML = state.errors.length ? [...state.errors].reverse().map(r => `<tr><td class="mono text-xs font-semibold text-rose-700">${escapeHTML(r.id)}</td><td class="text-xs">${escapeHTML(chicagoTime(r.received))}</td><td><span class="rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">${escapeHTML(r.gate)}</span></td><td class="wrap text-sm">${escapeHTML(r.detail)}</td><td class="mono text-xs text-slate-500">${escapeHTML(r.route)}</td></tr>`).join('') : emptyRow(5, 'No failed records. Perimeter gates are clear.');
+        $('reviewList').innerHTML = state.reviews.length ? [...state.reviews].reverse().map(r => `<div class="rounded-lg border border-amber-100 bg-white p-3"><div class="flex flex-wrap items-center justify-between gap-2"><span class="mono text-xs font-bold text-amber-800">${escapeHTML(r.id)}</span><span class="text-[11px] text-slate-400">${escapeHTML(shortTime(r.received))} CT</span></div><p class="mt-1 text-xs leading-5 text-slate-600">${escapeHTML(r.detail)}</p></div>`).join('') : '<p class="rounded-lg border border-amber-100 bg-white/75 p-3 text-xs text-slate-500">No records awaiting review.</p>';
+        $('queueCount').textContent = state.queue.length; $('dispatchedCount').textContent = state.dispatched.length; $('errorCount').textContent = state.errors.length; $('reviewCount').textContent = state.reviews.length;
+      }
+      function emptyRow(cols, text) { return `<tr><td colspan="${cols}" class="py-10 text-center text-sm text-slate-400">${escapeHTML(text)}</td></tr>`; }
+      const presets = {
+        row7: { phone: '(312) 555-0188 ext 4', address: '1840 W Addison St, Chicago, IL 60613', status: 'Scheduled', email: '', keys: 'LOBBY-4821; UNIT-19B' },
+        row8: { phone: '+1 773.555.0142', address: '725 N Dearborn St, Chicago, IL 60654', status: 'In Progress', email: 'ops@lakefront-service.io', keys: 'FRONT-2230; UNIT-08A' },
+        row9: { phone: '312-55-ABCD', address: '4100 N Marine Dr, Chicago, IL 60613', status: 'Awaiting Parts', email: 'field@citygrid-maint.com', keys: 'GARAGE-9012; UNIT-12C' }
+      };
+      $('preset').addEventListener('change', (event) => {
+        const data = presets[event.target.value];
+        if (!data) return;
+        $('phone').value = data.phone; $('address').value = data.address; $('status').value = data.status; $('email').value = data.email; $('keys').value = data.keys;
+        $('payloadBadge').textContent = event.target.options[event.target.selectedIndex].text;
+      });
+      ['phone', 'email', 'address', 'status', 'keys'].forEach(id => $(id).addEventListener('input', () => { $('preset').value = 'custom'; $('payloadBadge').textContent = 'Custom payload'; }));
+      $('status').addEventListener('change', () => { $('preset').value = 'custom'; $('payloadBadge').textContent = 'Custom payload'; });
+      document.querySelectorAll('.ledger-tab').forEach(tab => tab.addEventListener('click', () => {
+        document.querySelectorAll('.ledger-tab').forEach(t => { const active = t === tab; t.setAttribute('aria-selected', String(active)); t.className = `ledger-tab rounded-lg px-4 py-2.5 text-sm font-semibold ${active ? 'bg-teal text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`; });
+        document.querySelectorAll('.ledger-panel').forEach(p => p.classList.toggle('hidden', p.id !== `panel-${tab.dataset.panel}`));
+      }));
+      const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+      function setStep(index, mode) {
+        const card = document.querySelector(`[data-step="${index}"]`); const icon = card.querySelector('.step-icon');
+        card.classList.remove('step-active', 'step-done', 'border-rose-300', 'bg-rose-50', 'text-rose-700');
+        if (mode === 'active') { card.classList.add('step-active'); icon.innerHTML = '<span class="pulse-dot inline-block">Processing</span>'; }
+        if (mode === 'done') { card.classList.add('step-done'); icon.textContent = 'Complete'; }
+        if (mode === 'blocked') { card.classList.add('border-rose-300', 'bg-rose-50', 'text-rose-700'); icon.textContent = 'Blocked'; }
+        if (mode === 'queued') icon.textContent = 'Queued';
+      }
+      function logActivity(message, tone = 'teal') { const colors = { teal: 'text-emerald-400', rose: 'text-rose-400', violet: 'text-violet-300' }; $('activity').innerHTML = `<span class="mr-2 ${colors[tone] || colors.teal}">●</span><span>${escapeHTML(message)}</span>`; }
+      function notify(message, error = false) { const toast = $('toast'); toast.textContent = message; toast.className = `pointer-events-none fixed bottom-5 right-5 z-50 max-w-sm rounded-xl border px-4 py-3 text-sm font-semibold shadow-xl ${error ? 'border-rose-200 bg-rose-50 text-rose-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`; clearTimeout(notify.timer); notify.timer = setTimeout(() => toast.classList.add('hidden'), 4200); }
+      $('runBtn').addEventListener('click', async () => {
+        const button = $('runBtn'); if (button.disabled) return;
+        try {
+        button.disabled = true; $('engineState').textContent = 'Running'; $('engineState').className = 'rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700';
+        document.querySelectorAll('[data-step]').forEach((_, i) => setStep(i, 'queued'));
+        const record = { id: tracking(), phone: $('phone').value.trim(), email: $('email').value.trim(), address: $('address').value.trim(), status: $('status').value, keys: $('keys').value.trim(), received: nowISO() };
+        state.queue.unshift({ ...record, status: 'Processing' }); paint(); $('lastActivity').textContent = chicagoTime(record.received);
+        logActivity(`Tracking ${record.id} · payload accepted.`); setStep(0, 'active'); await sleep(450); setStep(0, 'done');
+        logActivity('Flattening phone digits with regex · translating timestamps to America/Chicago.', 'violet'); setStep(1, 'active'); await sleep(650);
+        const phone = phoneNormalize(record.phone); const normalizedAt = nowISO(); setStep(1, 'done');
+        logActivity('Checking required vendor email and perimeter policy.', 'violet'); setStep(2, 'active'); await sleep(500);
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(record.email);
+        if (!emailValid || !phone.ok) {
+          const gate = !emailValid ? 'vendor_email' : 'tenant_phone';
+          const detail = !emailValid ? (record.email ? `vendor_email is malformed: “${record.email}”. A valid vendor email is required.` : 'vendor_email is blank or unassigned. Required field validation failed.') : `tenant_phone could not be normalized to a 10-digit US number: “${record.phone || '(blank)'}”.`;
+          const failure = { id: record.id, received: record.received, gate, detail, route: 'HALTED · office review' };
+          state.errors.push(failure); state.reviews.push(failure);
+          const queueRow = state.queue.find(r => r.id === record.id); if (queueRow) queueRow.status = 'Office review';
+          setStep(2, 'blocked'); setStep(3, 'blocked'); $('engineState').textContent = 'Gate blocked'; $('engineState').className = 'rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700';
+          logActivity(`Perimeter gate halted ${record.id}: ${gate} validation failed. Target route protected.`, 'rose'); paint(); $('lastActivity').textContent = chicagoTime(nowISO()); notify('Record halted and routed to Needs Office Review.', true); button.disabled = false; return;
+        }
+        setStep(2, 'done'); await sleep(250); setStep(3, 'active');
+        await sleep(450);
+        const finalPhone = phone.value;
+        state.dispatched.unshift({ id: record.id, address: record.address || 'Address not provided', phone: finalPhone || 'Unparseable', email: record.email, time: normalizedAt, status: record.status, key: 'Stripped' });
+        const queueRow = state.queue.find(r => r.id === record.id); if (queueRow) queueRow.status = 'Dispatched';
+        setStep(3, 'done'); $('engineState').textContent = 'Complete'; $('engineState').className = 'rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700';
+        logActivity(phone.ok ? `Record ${record.id} dispatched · phone normalized · access keys stripped.` : `Record ${record.id} dispatched · phone shape flagged for follow-up · access keys stripped.`);
+        paint(); $('lastActivity').textContent = chicagoTime(nowISO()); notify('Record passed validation and was dispatched.'); button.disabled = false;
+        } catch (error) {
+          console.error('Pipeline simulation failed:', error);
+          $('engineState').textContent = 'Simulation error';
+          $('engineState').className = 'rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700';
+          logActivity(`Simulation error: ${error && error.message ? error.message : 'Unexpected processing failure'}. The target route was not confirmed.`, 'rose');
+          notify('The simulation encountered an error. Review the activity panel and retry.', true);
+          button.disabled = false;
+        }
+      });
+      paint();
+    })();
+  </script>
+</body>
+</html>
