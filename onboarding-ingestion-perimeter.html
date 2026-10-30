@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#09090b" />
+  <title>Enterprise Onboarding Pipeline // Runtime Interface</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-ink: #09090b;
+      --color-panel: #101217;
+      --color-line: #272a32;
+      --color-cyan: #22d3ee;
+      --color-sapphire: #3b82f6;
+    }
+  </style>
+  <style>
+    :root{color-scheme:dark;--bg:#09090b;--panel:#101217;--line:#292c35;--muted:#858b98;--cyan:#22d3ee;--blue:#3b82f6;--green:#4ade80;--red:#f87171}
+    *{box-sizing:border-box} body{margin:0;background-color:var(--bg);color:#f4f4f5;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:32px 32px;min-height:100vh}
+    .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}.panel{background:linear-gradient(145deg,rgba(19,21,27,.98),rgba(13,14,18,.98));border:1px solid var(--line);box-shadow:0 16px 50px rgba(0,0,0,.18)}
+    .eyebrow{font:600 10px/1.2 ui-monospace,SFMono-Regular,monospace;letter-spacing:.16em;text-transform:uppercase;color:#969ba7}.chip{border:1px solid #30343e;background:#111319;border-radius:7px;padding:8px 11px;display:flex;align-items:center;gap:9px}.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 10px #4ade8066}.input{width:100%;background:#0b0d11;border:1px solid #30343e;border-radius:6px;color:#f4f4f5;padding:11px 12px;font:13px ui-monospace,monospace;outline:none;transition:border .18s,box-shadow .18s}.input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f61c}.input::placeholder{color:#525866}.step{position:relative;display:flex;gap:14px;padding:0 0 25px;opacity:.45;transition:opacity .3s}.step:not(:last-child):before{content:"";position:absolute;left:13px;top:29px;bottom:0;width:1px;background:#30343e}.step.active,.step.done{opacity:1}.step.active .step-icon{border-color:#22d3ee;color:#67e8f9;box-shadow:0 0 20px #22d3ee20}.step.done .step-icon{border-color:#4ade80;color:#4ade80}.step-icon{width:27px;height:27px;border:1px solid #393d47;background:#111319;border-radius:50%;display:grid;place-items:center;flex:none;font:11px ui-monospace,monospace;color:#8b909c}.step-title{font-size:12px;font-weight:600;color:#e4e4e7}.step-detail{font:11px/1.55 ui-monospace,monospace;color:#898f9b;margin-top:5px;word-break:break-word}.btn{background:linear-gradient(100deg,#2563eb,#0891b2);border:1px solid #38bdf8;color:white;border-radius:6px;padding:12px 15px;font-size:12px;font-weight:700;letter-spacing:.03em;box-shadow:0 5px 20px #0284c733;transition:transform .15s,filter .15s}.btn:hover{filter:brightness(1.15);transform:translateY(-1px)}.btn:disabled{opacity:.55;cursor:wait;transform:none}.connector{height:1px;background:linear-gradient(90deg,#2563ebaa,#22d3ee77);position:relative;transition:all .2s}.connector:after{content:"";position:absolute;right:-1px;top:-3px;width:7px;height:7px;border-top:1px solid #22d3ee;border-right:1px solid #22d3ee;transform:rotate(45deg)}.connector.alert{height:2px;background:#ef4444;box-shadow:0 0 15px #ef4444;animation:pulse .5s 3}.connector.alert:after{border-color:#ef4444}.table-row{border-bottom:1px solid #252831}.table-row:last-child{border-bottom:0}.tag{font:10px ui-monospace,monospace;border:1px solid #343842;border-radius:4px;padding:3px 6px;color:#abb0ba}.audit{border-left:2px solid #3b82f6;background:#11141a;padding:9px 10px;font:10px/1.5 ui-monospace,monospace;color:#aeb4bf;animation:appear .25s ease-out}.toast{animation:appear .25s ease-out}.scan{background:linear-gradient(90deg,transparent,#22d3ee88,transparent);width:38%;height:1px;position:absolute;top:0;left:-40%;animation:sweep 2.7s linear infinite}.pulse-red{animation:pulse .5s 3}@keyframes pulse{50%{opacity:.25;filter:brightness(2)}}@keyframes sweep{to{left:105%}}@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    @media(max-width:900px){.connector{width:1px!important;height:25px;margin:auto;background:linear-gradient(#2563ebaa,#22d3ee77)}.connector:after{right:-3px;top:auto;bottom:-1px;transform:rotate(135deg)}}
+  </style>
+</head>
+<body>
+  <main class="mx-auto max-w-[1500px] px-5 py-7 md:px-8 md:py-9">
+    <header class="mb-7 border-b border-zinc-800/90 pb-6">
+      <div class="flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
+        <div>
+          <div class="mb-3 flex items-center gap-2 eyebrow"><span class="h-1.5 w-1.5 rounded-full bg-cyan-400"></span> Perimeter control plane <span class="text-zinc-600">/</span> Production simulation</div>
+          <h1 class="text-xl font-semibold tracking-[-.035em] text-zinc-100 sm:text-2xl">ENTERPRISE-ONBOARDING-PIPELINE <span class="text-zinc-600">//</span> <span class="text-cyan-300">RUNTIME INTERFACE</span></h1>
+          <p class="mono mt-2 text-[11px] text-zinc-500">CLIENT INGESTION · IDENTITY RESOLUTION · IDEMPOTENT PERSISTENCE</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <div class="chip"><span class="dot"></span><span class="eyebrow">Ingestion Gateway</span><span class="mono text-[11px] text-green-300">ONLINE</span></div>
+          <div class="chip"><span class="dot"></span><span class="eyebrow">Webhook Listeners</span><span class="mono text-[11px] text-green-300">ACTIVE</span></div>
+          <div class="chip"><span class="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_9px_#22d3ee66]"></span><span class="eyebrow">Suppressed Duplicates</span><span id="suppressed-count" class="mono text-[11px] text-cyan-200">000</span></div>
+        </div>
+      </div>
+      <div class="mt-5 flex flex-wrap items-center justify-between gap-2 mono text-[10px] text-zinc-600"><span>NODE <span class="text-zinc-400">INGEST-EU-04</span> &nbsp;·&nbsp; REGION <span class="text-zinc-400">EU-WEST</span> &nbsp;·&nbsp; BUILD <span class="text-zinc-400">v2.8.14</span></span><span id="clock">UTC --:--:--</span></div>
+    </header>
+
+    <section class="grid items-stretch gap-3 xl:grid-cols-[minmax(270px,1fr)_34px_minmax(300px,1.05fr)_34px_minmax(320px,1.15fr)]">
+      <article class="panel rounded-lg p-5 md:p-6">
+        <div class="mb-6 flex items-start justify-between"><div><div class="eyebrow text-blue-300">01 / Payload source</div><h2 class="mt-2 text-base font-semibold">Manual entry</h2><p class="mt-1 text-xs text-zinc-500">Compose a client event for ingestion.</p></div><span class="tag">POST /v1/onboard</span></div>
+        <form id="payload-form" class="space-y-4">
+          <label class="block"><span class="mb-2 block eyebrow">Full name <span class="text-zinc-600">· raw input</span></span><input id="full-name" class="input" autocomplete="off" value="  Maya   Chen  " required /></label>
+          <label class="block"><span class="mb-2 block eyebrow">Email address <span class="text-zinc-600">· identity key</span></span><input id="email" class="input" type="email" autocomplete="off" value="  Maya.Chen@Northstar.IO  " required /></label>
+          <div class="grid grid-cols-[1fr_110px] gap-3"><label class="block"><span class="mb-2 block eyebrow">Account total</span><input id="amount" class="input" type="number" min="0" step="0.01" value="12500" required /></label><label class="block"><span class="mb-2 block eyebrow">Currency</span><select id="currency" class="input h-[41px] appearance-none"><option>USD</option><option selected>CAD</option></select></label></div>
+          <div class="rounded-md border border-zinc-800 bg-black/20 px-3 py-2.5"><div class="flex items-center justify-between"><span class="eyebrow">FX conversion factor</span><span class="mono text-[11px] text-cyan-300">CAD → USD <b class="font-medium">0.73×</b></span></div></div>
+          <button id="fire-button" class="btn w-full" type="submit"><span class="mr-2">↗</span> FIRE WEBHOOK PAYLOAD</button>
+          <p id="form-status" class="min-h-[15px] mono text-[10px] text-zinc-500">Awaiting payload · schema v1.4</p>
+        </form>
+        <div class="mt-6 border-t border-zinc-800 pt-4"><div class="eyebrow mb-2">Event envelope</div><pre id="payload-preview" class="mono whitespace-pre-wrap text-[10px] leading-5 text-zinc-500">{
+  "event": "client.onboarding",
+  "source": "manual-console",
+  "schema": "v1.4"
+}</pre></div>
+      </article>
+
+      <div class="flex items-center justify-center px-3 xl:px-0"><div id="connector-left" class="connector w-full"></div></div>
+
+      <article class="panel relative overflow-hidden rounded-lg p-5 md:p-6">
+        <div class="scan"></div><div class="mb-6 flex items-start justify-between"><div><div class="eyebrow text-cyan-300">02 / Transform pipeline</div><h2 class="mt-2 text-base font-semibold">Normalization lab</h2><p class="mt-1 text-xs text-zinc-500">Deterministic identity processing.</p></div><span class="tag text-cyan-200">LIVE TRACE</span></div>
+        <div class="mb-5 rounded-md border border-zinc-800 bg-[#0b0d11] p-3"><div class="mb-2 flex justify-between eyebrow"><span>Execution trace</span><span id="trace-id" class="text-zinc-600">IDLE</span></div><div id="terminal" class="mono min-h-[36px] text-[11px] leading-5 text-zinc-500">// waiting for webhook event</div></div>
+        <div class="pl-1">
+          <div class="step" id="step-1"><span class="step-icon">01</span><div><div class="step-title">String trimming &amp; lowercasing</div><div id="step-detail-1" class="step-detail">Normalize whitespace and email casing</div></div></div>
+          <div class="step" id="step-2"><span class="step-icon">02</span><div><div class="step-title">Currency factor normalization</div><div id="step-detail-2" class="step-detail">Apply the live CAD → USD factor</div></div></div>
+          <div class="step" id="step-3"><span class="step-icon">03</span><div><div class="step-title">Cryptographic identity generation</div><div id="step-detail-3" class="step-detail">SHA-256 digest → stable identity index</div></div></div>
+        </div>
+        <div id="gate-banner" class="mt-1 hidden rounded-md border border-red-500/40 bg-red-500/[.07] px-3 py-2.5 toast"><div class="flex items-center gap-2 text-[11px] font-semibold text-red-300"><span class="h-1.5 w-1.5 rounded-full bg-red-400"></span>DUPLICATE RECORDS SUPPRESSED GATE</div><div class="mono mt-1 text-[10px] text-red-200/70">Existing identity matched · insert blocked · index refreshed</div></div>
+        <div class="mt-4 flex items-center justify-between border-t border-zinc-800 pt-3 mono text-[10px] text-zinc-600"><span>PIPELINE LATENCY</span><span id="latency" class="text-zinc-400">—</span></div>
+      </article>
+
+      <div class="flex items-center justify-center px-3 xl:px-0"><div id="connector-right" class="connector w-full"></div></div>
+
+      <article class="panel rounded-lg p-5 md:p-6">
+        <div class="mb-5 flex items-start justify-between"><div><div class="eyebrow text-blue-300">03 / Persistence layer</div><h2 class="mt-2 text-base font-semibold">Idempotent upsert gate</h2><p class="mt-1 text-xs text-zinc-500">Mock client ledger · indexed by identity hash.</p></div><span class="flex items-center gap-1.5 tag"><span class="h-1.5 w-1.5 rounded-full bg-green-400"></span> WRITE READY</span></div>
+        <div class="overflow-hidden rounded-md border border-zinc-800"><div class="grid grid-cols-[1.2fr_1.35fr_.72fr] gap-2 bg-[#0b0d11] px-3 py-2.5 eyebrow"><span>CLIENT</span><span>IDENTITY / INDEX</span><span class="text-right">USD TOTAL</span></div><div id="ledger-body"></div><div id="empty-ledger" class="hidden px-3 py-7 text-center mono text-[10px] text-zinc-600">No records in ledger.</div></div>
+        <div class="mt-5"><div class="mb-2 flex items-center justify-between"><div class="eyebrow">Metadata audit stream</div><span id="audit-count" class="tag">00 EVENTS</span></div><div id="audit-list" class="flex max-h-[220px] flex-col gap-2 overflow-y-auto"><div class="mono py-3 text-center text-[10px] text-zinc-600">// audit stream initialized</div></div></div>
+        <div class="mt-4 flex justify-between border-t border-zinc-800 pt-3 mono text-[10px] text-zinc-600"><span>INDEX STATUS</span><span class="text-green-300">CONSISTENT</span></div>
+      </article>
+    </section>
+    <footer class="mt-5 flex flex-wrap justify-between gap-2 mono text-[9px] tracking-wide text-zinc-700"><span>INGESTION PERIMETER / INTERNAL RUNTIME CONSOLE</span><span>EVENT DRIVEN · EXACTLY ONCE EFFECTS · SHA-256</span></footer>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const ledger = [];
+    let suppressed = 0;
+    let busy = false;
+    const isoNow = () => new Date().toISOString();
+    function setClock(){ $('clock').textContent = 'UTC ' + new Date().toISOString().slice(11,19); }
+    setClock(); setInterval(setClock,1000);
+    function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+    function shortHash(hash){return hash.slice(0,12)+'…'+hash.slice(-6);}
+    function renderLedger(){
+      $('ledger-body').innerHTML = ledger.map((r)=>`<div class="table-row grid grid-cols-[1.2fr_1.35fr_.72fr] items-center gap-2 px-3 py-3"><div class="min-w-0"><div class="truncate text-[11px] font-medium text-zinc-200">${escapeHtml(r.name)}</div><div class="truncate mono mt-1 text-[9px] text-zinc-600">${escapeHtml(r.email)}</div></div><div class="min-w-0"><div class="mono truncate text-[10px] text-cyan-200">${shortHash(r.hash)}</div><div class="mono mt-1 text-[9px] text-zinc-600">IDX-${String(r.index).padStart(4,'0')} · REV ${String(r.revision).padStart(2,'0')}</div></div><div class="text-right"><div class="mono text-[10px] text-zinc-200">$${r.usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div><div class="mt-1 text-[9px] text-zinc-600">USD</div></div></div>`).join('');
+      $('empty-ledger').classList.toggle('hidden',ledger.length!==0);
+    }
+    function audit(kind, message, color='blue'){
+      const item=document.createElement('div'); item.className='audit'; item.style.borderLeftColor=color==='red'?'#ef4444':color==='green'?'#4ade80':'#3b82f6';
+      item.innerHTML=`<div class="flex justify-between gap-2"><span style="color:${color==='red'?'#fca5a5':color==='green'?'#86efac':'#93c5fd'}">${escapeHtml(kind)}</span><span class="text-zinc-600">${new Date().toISOString().slice(11,19)}Z</span></div><div>${escapeHtml(message)}</div>`;
+      const list=$('audit-list'); if(list.firstElementChild?.textContent.includes('audit stream initialized')) list.innerHTML=''; list.prepend(item); $('audit-count').textContent=String(list.children.length).padStart(2,'0')+' EVENTS';
+    }
+    async function sha256(value){const bytes=new TextEncoder().encode(value);const digest=await crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+    function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
+    function resetSteps(){for(let n=1;n<=3;n++){$('step-'+n).classList.remove('active','done');$('step-detail-'+n).textContent=['Normalize whitespace and email casing','Apply the live CAD → USD factor','SHA-256 digest → stable identity index'][n-1];}$('gate-banner').classList.add('hidden');$('connector-left').classList.remove('alert');$('connector-right').classList.remove('alert');}
+    $('email').addEventListener('input',updatePreview);$('full-name').addEventListener('input',updatePreview);$('amount').addEventListener('input',updatePreview);$('currency').addEventListener('change',updatePreview);
+    function updatePreview(){const envelope={event:'client.onboarding',source:'manual-console',schema:'v1.4',data:{fullName:$('full-name').value,email:$('email').value,accountTotal:Number($('amount').value||0),currency:$('currency').value}};$('payload-preview').textContent=JSON.stringify(envelope,null,2);}
+    updatePreview(); renderLedger();
+    $('payload-form').addEventListener('submit',async(e)=>{
+      e.preventDefault(); if(busy)return;
+      const rawName=$('full-name').value, rawEmail=$('email').value, amount=Number($('amount').value), currency=$('currency').value;
+      const name=rawName.trim().replace(/\s+/g,' '), email=rawEmail.trim().toLowerCase();
+      if(!name||!email||!Number.isFinite(amount)||amount<0){$('form-status').textContent='Invalid payload · check required fields';$('form-status').className='min-h-[15px] mono text-[10px] text-red-300';return;}
+      busy=true;$('fire-button').disabled=true;$('form-status').textContent='Dispatching webhook · processing';$('form-status').className='min-h-[15px] mono text-[10px] text-cyan-300';resetSteps();
+      const started=performance.now(), trace='TRC-'+Math.random().toString(16).slice(2,8).toUpperCase();$('trace-id').textContent=trace;$('terminal').textContent='> event accepted · '+isoNow().slice(11,23)+'Z';
+      try{
+        $('step-1').classList.add('active');await wait(520);$('step-detail-1').textContent=`name: "${name}" · email: "${email}"`;$('step-1').classList.replace('active','done');$('terminal').textContent='> normalized identity fields';
+        $('step-2').classList.add('active');await wait(520);const usd=currency==='CAD'?amount*0.73:amount;$('step-detail-2').textContent=currency==='CAD'?`${amount.toFixed(2)} CAD × 0.73 = ${usd.toFixed(2)} USD`:`${amount.toFixed(2)} USD × 1.00 = ${usd.toFixed(2)} USD`;$('step-2').classList.replace('active','done');$('terminal').textContent='> currency normalized · USD '+usd.toFixed(2);
+        $('step-3').classList.add('active');const hash=await sha256(email);await wait(420);$('step-detail-3').textContent='sha256(email) → '+hash;$('step-3').classList.replace('active','done');$('terminal').textContent='> identity digest computed · '+shortHash(hash);
+        const existing=ledger.find(r=>r.email===email);
+        if(existing){
+          $('connector-left').classList.add('alert');$('connector-right').classList.add('alert');$('gate-banner').classList.remove('hidden');$('terminal').innerHTML='<span class="text-red-300">! duplicate identity match · insert suppressed</span>';
+          existing.name=name;existing.usd=usd;existing.currency=currency;existing.hash=hash;existing.revision++;existing.updatedAt=isoNow();suppressed++;$('suppressed-count').textContent=String(suppressed).padStart(3,'0');renderLedger();audit('DUPLICATE_SUPPRESSED',`email=${email} · insert blocked · IDX-${String(existing.index).padStart(4,'0')} updated`,'red');$('form-status').textContent='Duplicate suppressed · existing index updated';$('form-status').className='min-h-[15px] mono text-[10px] text-red-300';
+        }else{
+          const record={name,email,usd,currency,hash,index:ledger.length+1,revision:1,createdAt:isoNow()};ledger.push(record);renderLedger();audit('UPSERT_COMMITTED',`email=${email} · new index IDX-${String(record.index).padStart(4,'0')} · ${usd.toFixed(2)} USD`,'green');$('terminal').textContent='> upsert committed · IDX-'+String(record.index).padStart(4,'0');$('form-status').textContent='Payload committed · ledger index created';$('form-status').className='min-h-[15px] mono text-[10px] text-green-300';
+        }
+        $('latency').textContent=Math.round(performance.now()-started)+' ms';
+      }catch(err){$('terminal').textContent='! processing error · crypto provider unavailable';$('form-status').textContent='Processing failed · retry payload';$('form-status').className='min-h-[15px] mono text-[10px] text-red-300';audit('PROCESSING_ERROR','Identity digest unavailable · '+err.message,'red');}
+      finally{await wait(850);$('connector-left').classList.remove('alert');$('connector-right').classList.remove('alert');busy=false;$('fire-button').disabled=false;}
+    });
+  </script>
+</body>
+</html>

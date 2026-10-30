@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#020617" />
+  <title>ADR Operational Triage Pipeline · Staging Sandbox</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    :root { color-scheme: dark; --bg:#020617; --panel:#07111f; --line:#172334; --muted:#8292a8; --green:#34d399; }
+    * { box-sizing:border-box }
+    body { margin:0; min-height:100vh; background:var(--bg); color:#e2e8f0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button { font:inherit }
+    .grid-bg { background-image:linear-gradient(rgba(148,163,184,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.035) 1px,transparent 1px); background-size:28px 28px }
+    .panel { background:linear-gradient(145deg,rgba(15,23,42,.82),rgba(7,17,31,.94)); border:1px solid var(--line); box-shadow:0 12px 36px rgba(0,0,0,.16); }
+    .eyebrow { letter-spacing:.15em; font-size:10px; font-weight:700; text-transform:uppercase; color:#8191a8 }
+    .mono { font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace }
+    .scrollbar::-webkit-scrollbar { width:5px; height:5px }.scrollbar::-webkit-scrollbar-thumb { background:#263449; border-radius:8px }
+    .bundle { animation:enter .28s ease-out both }.row-enter { animation:rowenter .32s ease-out both }
+    @keyframes enter { from {opacity:0;transform:translateY(8px)} to {opacity:1;transform:translateY(0)} }
+    @keyframes rowenter { from {opacity:0;transform:translateX(8px)} to {opacity:1;transform:translateX(0)} }
+    @keyframes pulse { 50% { box-shadow:0 0 0 7px rgba(52,211,153,.04) } }
+    .live-pulse { animation:pulse 2s infinite }
+    .check-on { color:#6ee7b7; border-color:rgba(52,211,153,.3); background:rgba(16,185,129,.08) }
+    .switch { width:36px;height:20px;border-radius:99px;background:#334155;position:relative;transition:.2s;cursor:pointer }
+    .switch:after { content:"";position:absolute;width:14px;height:14px;top:3px;left:3px;border-radius:50%;background:#cbd5e1;transition:.2s }
+    .switch.on { background:#059669 }.switch.on:after { left:19px;background:white }
+    .flow-line { background:linear-gradient(90deg,#1e293b,#10b981,#1e293b); background-size:200% 100%; animation:flow 2.8s linear infinite }
+    @keyframes flow { to {background-position:-200% 0} }
+    .toast { animation:enter .2s ease-out }
+    @media(max-width:1023px){ .main-grid{grid-template-columns:1fr!important}.queue-list{max-height:320px!important}.ledger-list{max-height:360px!important} }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body class="grid-bg">
+  <div class="min-h-screen">
+    <header class="border-b border-slate-800/90 bg-slate-950/90 backdrop-blur-xl">
+      <div class="mx-auto max-w-[1680px] px-5 py-4 lg:px-8">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div class="flex items-start gap-3">
+            <div class="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 text-emerald-400">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h6v5H4zM14 13h6v5h-6zM10 8.5h4a2 2 0 0 1 2 2V13M7 11v5a2 2 0 0 0 2 2h5"/><path d="m12 7 2 1.5-2 1.5M12 16l2 2-2 2"/></svg>
+            </div>
+            <div><div class="eyebrow mb-1">ADR / Operational Systems</div><h1 class="text-sm font-bold tracking-[.07em] text-white sm:text-base">ADR-OPERATIONAL-TRIAGE-PIPELINE <span class="text-slate-500">//</span> <span class="text-emerald-300">STAGING SANDBOX</span></h1><p class="mt-1 text-xs text-slate-500">Asynchronous intake · validation · staging orchestration</p></div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div class="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2"><span class="relative flex h-2 w-2"><span id="statusRipple" class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-50"></span><span id="statusDot" class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span></span><span id="pipelineStatus" class="text-xs font-semibold text-emerald-300">PIPELINE OPERATIONAL</span></div>
+            <div class="rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2"><span class="eyebrow mr-2">Throughput</span><span id="throughput" class="mono text-xs font-semibold text-white">0.0</span><span class="ml-1 text-[10px] text-slate-500">rec/min</span></div>
+            <div class="rounded-lg border border-slate-800 bg-slate-900/70 px-3 py-2"><span class="eyebrow mr-2">Uptime</span><span id="uptime" class="mono text-xs font-semibold text-white">00:00:00</span></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-[1680px] px-5 py-6 lg:px-8">
+      <section class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="panel rounded-xl p-4"><div class="flex items-center justify-between"><span class="eyebrow">Total processed</span><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">↗</span></div><div class="mt-3 flex items-baseline gap-2"><span id="metricProcessed" class="mono text-3xl font-semibold tracking-tight text-white">0</span><span class="text-xs text-slate-500">records staged</span></div><div class="mt-3 h-1 overflow-hidden rounded-full bg-slate-800"><div id="processedBar" class="h-full rounded-full bg-emerald-400 transition-all duration-500" style="width:4%"></div></div></div>
+        <div class="panel rounded-xl p-4"><div class="flex items-center justify-between"><span class="eyebrow">Active queue length</span><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 text-sky-400">≋</span></div><div class="mt-3 flex items-baseline gap-2"><span id="metricQueue" class="mono text-3xl font-semibold tracking-tight text-white">0</span><span id="queueCapacity" class="text-xs text-slate-500">of 120 buffer slots</span></div><div class="mt-3 h-1 overflow-hidden rounded-full bg-slate-800"><div id="queueBar" class="h-full rounded-full bg-sky-400 transition-all duration-500" style="width:0%"></div></div></div>
+        <div class="panel rounded-xl p-4"><div class="flex items-center justify-between"><span class="eyebrow">Error rate</span><span class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">!</span></div><div class="mt-3 flex items-baseline gap-2"><span id="metricError" class="mono text-3xl font-semibold tracking-tight text-white">0.0%</span><span class="text-xs text-slate-500">validation rejects</span></div><div class="mt-3 h-1 overflow-hidden rounded-full bg-slate-800"><div id="errorBar" class="h-full rounded-full bg-amber-400 transition-all duration-500" style="width:0%"></div></div></div>
+      </section>
+
+      <section class="main-grid grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(250px,0.88fr)_minmax(430px,1.35fr)_minmax(360px,1.15fr)]">
+        <aside class="panel overflow-hidden rounded-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3.5"><div><div class="flex items-center gap-2"><h2 class="text-sm font-semibold text-white">Queue Monitor</h2><span id="queueCountBadge" class="rounded-md border border-slate-700 bg-slate-800/80 px-1.5 py-0.5 mono text-[10px] text-slate-300">0</span></div><p class="mt-1 text-[11px] text-slate-500">Incoming data bundles</p></div><button id="addBundle" class="rounded-lg border border-slate-700 bg-slate-800/80 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 transition hover:border-emerald-500/50 hover:text-emerald-300" title="Add a sample bundle">+ Bundle</button></div>
+          <div class="flex items-center justify-between px-4 py-2.5"><span class="eyebrow">Intake stream</span><span class="mono text-[10px] text-slate-500">FIFO · bounded</span></div>
+          <div id="queueList" class="queue-list scrollbar max-h-[544px] space-y-2 overflow-auto px-3 pb-3" aria-live="polite"></div>
+          <div id="queueEmpty" class="hidden px-4 pb-5 pt-7 text-center"><div class="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-800 text-slate-600">✓</div><p class="text-xs text-slate-400">Queue is clear</p><p class="mt-1 text-[10px] text-slate-600">New bundles will appear here</p></div>
+          <div class="border-t border-slate-800 px-4 py-2.5"><div class="flex items-center justify-between text-[10px]"><span class="text-slate-500">Backpressure guard</span><span id="guardStatus" class="text-emerald-400">● READY</span></div></div>
+        </aside>
+
+        <section class="panel overflow-hidden rounded-xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 px-4 py-3.5"><div><div class="flex items-center gap-2"><h2 class="text-sm font-semibold text-white">Asynchronous Processing Matrix</h2><span class="rounded-md border border-violet-500/20 bg-violet-500/10 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-violet-300">ENGINE v2.4</span></div><p class="mt-1 text-[11px] text-slate-500">Rule evaluation · isolated worker cycle</p></div><div class="flex items-center gap-2"><span class="text-[10px] text-slate-500">Auto-stream</span><button id="autoToggle" role="switch" aria-checked="false" aria-label="Toggle auto-stream logs" class="switch"></button><span id="autoState" class="mono w-6 text-[9px] text-slate-500">OFF</span></div></div>
+          <div class="p-4">
+            <div class="mb-4 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2.5"><div class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-slate-600"></span><span class="eyebrow">Cycle controller</span><span id="cycleLabel" class="mono text-[10px] text-slate-400">IDLE · AWAITING INPUT</span></div><button id="runCycle" class="rounded-lg bg-emerald-500 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-950/20 transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 disabled:cursor-wait disabled:opacity-60">Run Single Cycle <span class="ml-1">→</span></button></div>
+            <div class="rounded-xl border border-slate-800 bg-slate-950/65 p-4">
+              <div class="mb-4 flex items-center justify-between"><div class="flex items-center gap-2"><span class="flex h-7 w-7 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10 text-violet-300">⌘</span><div><div class="text-xs font-semibold text-slate-200">Triage engine</div><div class="mono mt-0.5 text-[9px] text-slate-600">ASYNC WORKER · PARTITION 01</div></div></div><span id="engineState" class="rounded-md border border-slate-800 bg-slate-900 px-2 py-1 mono text-[9px] text-slate-500">STANDBY</span></div>
+              <div id="processor" class="live-pulse relative flex min-h-[106px] items-center justify-center overflow-hidden rounded-xl border border-dashed border-slate-800 bg-slate-900/40 px-4 py-4 transition-all duration-300"><div id="processorEmpty" class="text-center"><div class="mono text-[10px] tracking-wide text-slate-600">PROCESSING SLOT AVAILABLE</div><div class="mt-1 text-[10px] text-slate-700">A bundle will enter on the next cycle</div></div><div id="processingCard" class="hidden w-full max-w-[340px] rounded-lg border border-emerald-500/30 bg-slate-900 px-3 py-2.5 shadow-lg shadow-emerald-950/20"><div class="flex items-center justify-between"><span id="procId" class="mono text-[11px] font-semibold text-emerald-300">TRX-000000</span><span id="procPhase" class="rounded bg-emerald-500/10 px-1.5 py-0.5 mono text-[9px] text-emerald-300">VALIDATING</span></div><div class="mt-1 flex items-center justify-between"><span id="procCategory" class="text-[10px] text-slate-400">Transit</span><span id="procTime" class="mono text-[9px] text-slate-600">--:--:--</span></div><div class="mt-2 h-0.5 overflow-hidden rounded bg-slate-800"><div id="procProgress" class="h-full w-0 bg-emerald-400 transition-all duration-300"></div></div></div></div>
+              <div class="flow-line mx-auto h-px w-3/4 opacity-60"></div>
+              <div class="mt-4 grid grid-cols-3 gap-2">
+                <div id="check-trim" class="rounded-lg border border-slate-800 bg-slate-900/60 px-2.5 py-3 transition"><div class="flex items-center justify-between"><span class="eyebrow !text-[8px]">01 · Normalize</span><span class="check-icon text-[10px] text-slate-700">○</span></div><div class="mt-2 text-[10px] font-medium text-slate-400">Field Trimming</div><div class="check-detail mt-1 mono text-[8px] text-slate-600">WHITESPACE · NULLS</div></div>
+                <div id="check-isolate" class="rounded-lg border border-slate-800 bg-slate-900/60 px-2.5 py-3 transition"><div class="flex items-center justify-between"><span class="eyebrow !text-[8px]">02 · Sandbox</span><span class="check-icon text-[10px] text-slate-700">○</span></div><div class="mt-2 text-[10px] font-medium text-slate-400">Payload Isolation</div><div class="check-detail mt-1 mono text-[8px] text-slate-600">SCOPED · NO LEAKAGE</div></div>
+                <div id="check-parse" class="rounded-lg border border-slate-800 bg-slate-900/60 px-2.5 py-3 transition"><div class="flex items-center justify-between"><span class="eyebrow !text-[8px]">03 · Validate</span><span class="check-icon text-[10px] text-slate-700">○</span></div><div class="mt-2 text-[10px] font-medium text-slate-400">Structural Parsing</div><div class="check-detail mt-1 mono text-[8px] text-slate-600">SCHEMA · REQUIRED KEYS</div></div>
+              </div>
+              <div class="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3"><span class="eyebrow !text-[9px]">Pipeline stages</span><span class="mono text-[9px] text-slate-600">INTAKE <span class="text-slate-700">→</span> TRIAGE <span class="text-slate-700">→</span> STAGE</span></div>
+            </div>
+
+            <div class="mt-4 rounded-xl border border-slate-800 bg-slate-950/65 p-3.5"><div class="flex flex-wrap items-center justify-between gap-3"><div><div class="flex items-center gap-2"><span class="flex h-7 w-7 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10 text-amber-300">⚡</span><div><div class="text-xs font-semibold text-slate-200">Exploratory controls</div><div class="mt-0.5 text-[10px] text-slate-600">Stress-test queue resilience</div></div></div></div><button id="spikeButton" aria-pressed="false" class="flex items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-[10px] font-bold text-amber-300 transition hover:border-amber-400/50 hover:bg-amber-500/15"><span id="spikeGlyph">↯</span><span id="spikeLabel">Simulate API High-Volume Spike</span></button></div><div class="mt-3 grid grid-cols-3 gap-2 border-t border-slate-800/70 pt-3"><div><div class="eyebrow !text-[8px]">Ingress rate</div><div id="ingressRate" class="mono mt-1 text-xs text-slate-300">0 <span class="text-[9px] text-slate-600">evt/s</span></div></div><div><div class="eyebrow !text-[8px]">Buffer policy</div><div class="mono mt-1 text-xs text-slate-300">BOUNDED <span class="text-[9px] text-slate-600">FIFO</span></div></div><div><div class="eyebrow !text-[8px]">Overflow handled</div><div id="overflowCount" class="mono mt-1 text-xs text-slate-300">0 <span class="text-[9px] text-slate-600">shed</span></div></div></div></div>
+          </div>
+        </section>
+
+        <section class="panel overflow-hidden rounded-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3.5"><div><div class="flex items-center gap-2"><h2 class="text-sm font-semibold text-white">Staging Lake Ledger</h2><span class="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 mono text-[9px] text-emerald-300">WRITE-THROUGH</span></div><p class="mt-1 text-[11px] text-slate-500">Validated records · append-only view</p></div><div class="flex items-center gap-1.5 text-[10px] text-slate-500"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> STAGING_LAKE_01</div></div>
+          <div class="overflow-x-auto"><div class="min-w-[460px]"><div class="grid grid-cols-[1.2fr_1fr_1fr_.8fr] gap-2 border-b border-slate-800 bg-slate-950/60 px-4 py-2.5"><span class="eyebrow !text-[8px]">Transaction ID</span><span class="eyebrow !text-[8px]">Category</span><span class="eyebrow !text-[8px]">Staged at</span><span class="eyebrow !text-[8px]">Status</span></div><div id="ledgerList" class="ledger-list scrollbar max-h-[475px] overflow-auto"></div><div id="ledgerEmpty" class="px-5 py-16 text-center"><div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-600">▤</div><p class="text-xs text-slate-400">No staged records yet</p><p class="mt-1 text-[10px] text-slate-600">Validated bundles will be written here</p></div></div></div>
+          <div class="flex items-center justify-between border-t border-slate-800 px-4 py-2.5"><span class="text-[10px] text-slate-500">Showing latest <span id="ledgerShown" class="mono text-slate-400">0</span> records</span><span class="mono text-[9px] text-slate-600">APPEND-ONLY · UTC</span></div>
+        </section>
+      </section>
+      <footer class="mt-5 flex flex-col justify-between gap-2 border-t border-slate-800/70 pt-3 text-[10px] text-slate-600 sm:flex-row"><span>ADR OPERATIONS <span class="mx-1 text-slate-800">/</span> ASYNC TRIAGE SANDBOX</span><span class="mono">SESSION <span id="sessionId" class="text-slate-500">STG-000000</span> <span class="mx-1 text-slate-800">·</span> <span id="clock">--:--:--</span> UTC</span></footer>
+    </main>
+  </div>
+  <div id="toastHost" class="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[min(360px,calc(100vw-2rem))] flex-col gap-2" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+      const MAX_QUEUE = 120, MAX_VISIBLE_QUEUE = 14, MAX_LEDGER = 80;
+      const categories = [
+        {name:'Transit', color:'sky'}, {name:'Logistical', color:'violet'}, {name:'Core Finance', color:'amber'},
+        {name:'Infrastructure', color:'cyan'}, {name:'Customer Ops', color:'pink'}
+      ];
+      const state = { queue:[], ledger:[], processed:0, rejected:0, overflow:0, auto:false, autoTimer:null, cycleBusy:false, spike:false, spikeTimer:null, start:Date.now(), cycle:0, throughputSamples:[] };
+      const $ = id => document.getElementById(id);
+      const fmtTime = d => d.toISOString().slice(11,19);
+      const colorMap = {sky:'border-sky-500/20 bg-sky-500/10 text-sky-300',violet:'border-violet-500/20 bg-violet-500/10 text-violet-300',amber:'border-amber-500/20 bg-amber-500/10 text-amber-300',cyan:'border-cyan-500/20 bg-cyan-500/10 text-cyan-300',pink:'border-pink-500/20 bg-pink-500/10 text-pink-300'};
+      function makeBundle() {
+        const cat = categories[Math.floor(Math.random()*categories.length)];
+        const id = 'TRX-' + Date.now().toString(36).toUpperCase().slice(-5) + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
+        return {id, category:cat.name, color:cat.color, time:new Date(), invalid:Math.random()<.025};
+      }
+      function enqueue(bundle=makeBundle()) {
+        if(state.queue.length >= MAX_QUEUE) { state.overflow++; updateMetrics(); return false; }
+        state.queue.push(bundle); renderQueue(); updateMetrics(); return true;
+      }
+      function renderQueue() {
+        const list=$('queueList'); list.innerHTML='';
+        state.queue.slice(0,MAX_VISIBLE_QUEUE).forEach(b=>{
+          const el=document.createElement('div'); el.className='bundle rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2.5';
+          el.innerHTML=`<div class="flex items-center justify-between gap-2"><span class="mono text-[10px] font-semibold text-slate-300">${b.id}</span><span class="rounded border px-1.5 py-0.5 text-[8px] font-semibold ${colorMap[b.color]}">${b.category.toUpperCase()}</span></div><div class="mt-1.5 flex items-center justify-between"><span class="text-[9px] text-slate-600">RECEIVED</span><span class="mono text-[9px] text-slate-600">${fmtTime(b.time)} UTC</span></div>`; list.appendChild(el);
+        });
+        if(state.queue.length>MAX_VISIBLE_QUEUE){const more=document.createElement('div');more.className='rounded-lg border border-dashed border-slate-800 px-3 py-2 text-center mono text-[9px] text-slate-500';more.textContent=`+ ${state.queue.length-MAX_VISIBLE_QUEUE} buffered bundles`;list.appendChild(more)}
+        $('queueEmpty').classList.toggle('hidden',state.queue.length>0);
+        $('queueCountBadge').textContent=state.queue.length;
+      }
+      function updateMetrics() {
+        $('metricProcessed').textContent=state.processed.toLocaleString(); $('metricQueue').textContent=state.queue.length.toLocaleString();
+        $('metricError').textContent=(state.processed+state.rejected ? state.rejected/(state.processed+state.rejected)*100 : 0).toFixed(1)+'%';
+        $('processedBar').style.width=Math.max(4,Math.min(100,state.processed/2))+'%';
+        $('queueBar').style.width=Math.min(100,state.queue.length/MAX_QUEUE*100)+'%';
+        $('errorBar').style.width=Math.min(100,state.rejected/(state.processed+state.rejected||1)*100*5)+'%';
+        $('queueCapacity').textContent=`of ${MAX_QUEUE} buffer slots`; $('overflowCount').innerHTML=`${state.overflow} <span class="text-[9px] text-slate-600">shed</span>`;
+        const now=Date.now(); state.throughputSamples=state.throughputSamples.filter(x=>now-x<60000); $('throughput').textContent=(state.throughputSamples.length).toFixed(1);
+        $('ingressRate').innerHTML=`${state.spike?'18':state.auto?'1.2':'0'} <span class="text-[9px] text-slate-600">evt/s</span>`;
+        $('guardStatus').textContent=state.queue.length>MAX_QUEUE*.8?'● BACKPRESSURE':'● READY'; $('guardStatus').className=state.queue.length>MAX_QUEUE*.8?'text-amber-400':'text-emerald-400';
+        $('pipelineStatus').textContent=state.spike?'HIGH-VOLUME · GUARDED':state.cycleBusy?'PROCESSING':'PIPELINE OPERATIONAL'; $('statusDot').className='relative inline-flex h-2 w-2 rounded-full '+(state.spike?'bg-amber-400':state.cycleBusy?'bg-sky-400':'bg-emerald-400'); $('statusRipple').className='absolute inline-flex h-full w-full rounded-full '+(state.spike?'bg-amber-400':state.cycleBusy?'bg-sky-400':'bg-emerald-400')+' opacity-50';
+      }
+      function renderLedger() {
+        const list=$('ledgerList'); list.innerHTML='';
+        state.ledger.slice(0,MAX_LEDGER).forEach(r=>{const row=document.createElement('div');row.className='row-enter grid grid-cols-[1.2fr_1fr_1fr_.8fr] items-center gap-2 border-b border-slate-800/70 px-4 py-3 hover:bg-slate-900/50';row.innerHTML=`<span class="mono text-[9px] text-slate-300">${r.id}</span><span class="truncate text-[10px] text-slate-400">${r.category}</span><span class="mono text-[9px] text-slate-500">${fmtTime(r.staged)}</span><span class="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-400"><i class="h-1.5 w-1.5 rounded-full bg-emerald-400"></i> STAGED</span>`;list.appendChild(row)});
+        $('ledgerEmpty').classList.toggle('hidden',state.ledger.length>0); $('ledgerShown').textContent=Math.min(state.ledger.length,MAX_LEDGER);
+      }
+      function setCheck(key, status) {
+        const el=$('check-'+key), icon=el.querySelector('.check-icon'), detail=el.querySelector('.check-detail');
+        el.classList.remove('check-on'); if(status==='active'){el.classList.add('check-on');icon.textContent='◌';detail.textContent='RUNNING…'} else if(status==='done'){el.classList.add('check-on');icon.textContent='✓';detail.textContent='PASS · 0.02s'} else {icon.textContent='○';detail.textContent=({trim:'WHITESPACE · NULLS',isolate:'SCOPED · NO LEAKAGE',parse:'SCHEMA · REQUIRED KEYS'})[key]}
+      }
+      const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+      async function runCycle() {
+        if(state.cycleBusy) return;
+        if(!state.queue.length){toast('Queue is empty','Add a bundle or enable auto-stream to continue.');$('cycleLabel').textContent='IDLE · AWAITING INPUT';return}
+        state.cycleBusy=true;state.cycle++;$('runCycle').disabled=true;$('cycleLabel').textContent=`CYCLE ${String(state.cycle).padStart(4,'0')} · ACTIVE`;$('engineState').textContent='WORKING';$('engineState').className='rounded-md border border-sky-500/20 bg-sky-500/10 px-2 py-1 mono text-[9px] text-sky-300';$('processorEmpty').classList.add('hidden');$('processingCard').classList.remove('hidden');
+        const b=state.queue.shift();renderQueue();$('procId').textContent=b.id;$('procCategory').textContent=b.category;$('procTime').textContent=fmtTime(b.time)+' UTC';$('procProgress').style.width='0%';updateMetrics();
+        const steps=[['trim',180],['isolate',220],['parse',250]];let progress=0;
+        for(const [key,duration] of steps){setCheck(key,'active');$('procPhase').textContent=key.toUpperCase();await wait(duration);setCheck(key,'done');progress+=33.33;$('procProgress').style.width=progress+'%'}
+        await wait(110);
+        if(b.invalid){state.rejected++;$('procPhase').textContent='REJECTED';toast('Validation rejected',`${b.id} did not match the expected structure.`,'amber')}
+        else {state.processed++;state.ledger.unshift({...b,staged:new Date()});state.throughputSamples.push(Date.now());renderLedger();$('procPhase').textContent='STAGED'}
+        updateMetrics();await wait(250);$('processingCard').classList.add('hidden');$('processorEmpty').classList.remove('hidden');$('engineState').textContent='STANDBY';$('engineState').className='rounded-md border border-slate-800 bg-slate-900 px-2 py-1 mono text-[9px] text-slate-500';['trim','isolate','parse'].forEach(k=>setCheck(k,'idle'));$('cycleLabel').textContent=`CYCLE ${String(state.cycle).padStart(4,'0')} · COMPLETE`;state.cycleBusy=false;$('runCycle').disabled=false;updateMetrics();
+        if(state.auto && state.queue.length) setTimeout(runCycle,90);
+      }
+      function toast(title,message,tone='green') {const node=document.createElement('div');node.className='toast pointer-events-auto rounded-lg border px-3 py-2.5 shadow-xl backdrop-blur '+(tone==='amber'?'border-amber-500/30 bg-slate-900/95':'border-emerald-500/25 bg-slate-900/95');node.innerHTML=`<div class="flex gap-2"><span class="mt-0.5 text-xs ${tone==='amber'?'text-amber-300':'text-emerald-300'}">${tone==='amber'?'!':'✓'}</span><div><div class="text-xs font-semibold text-slate-200">${title}</div><div class="mt-0.5 text-[10px] text-slate-500">${message}</div></div></div>`;$('toastHost').appendChild(node);setTimeout(()=>{node.style.opacity='0';node.style.transform='translateY(6px)';setTimeout(()=>node.remove(),200)},3200)}
+      function setAuto(on) {state.auto=on;$('autoToggle').classList.toggle('on',on);$('autoToggle').setAttribute('aria-checked',String(on));$('autoState').textContent=on?'ON':'OFF';$('autoState').className='mono w-6 text-[9px] '+(on?'text-emerald-400':'text-slate-500');$('autoToggle').setAttribute('aria-label',on?'Disable auto-stream logs':'Enable auto-stream logs');if(state.auto){state.autoTimer=setInterval(()=>{if(!state.spike) enqueue()},1500);if(state.queue.length)runCycle()}else{clearInterval(state.autoTimer);state.autoTimer=null}updateMetrics()}
+      function setSpike(on) {state.spike=on;$('spikeButton').setAttribute('aria-pressed',String(on));$('spikeButton').classList.toggle('border-amber-400/60',on);$('spikeButton').classList.toggle('bg-amber-500/20',on);$('spikeLabel').textContent=on?'Stop High-Volume Spike':'Simulate API High-Volume Spike';$('spikeGlyph').textContent=on?'Ⅱ':'↯';if(on){for(let i=0;i<Math.min(24,MAX_QUEUE-state.queue.length);i++)enqueue();state.spikeTimer=setInterval(()=>{for(let i=0;i<8;i++)enqueue()},650);toast('Spike simulation active','Ingress burst is being absorbed by the bounded FIFO buffer.')}else{clearInterval(state.spikeTimer);state.spikeTimer=null;toast('Spike simulation stopped','Queue continues draining at the configured cycle rate.')}updateMetrics()}
+      $('runCycle').addEventListener('click',runCycle);$('autoToggle').addEventListener('click',()=>setAuto(!state.auto));$('spikeButton').addEventListener('click',()=>setSpike(!state.spike));$('addBundle').addEventListener('click',()=>{enqueue();toast('Bundle received','One simulation record was added to the intake stream.')});
+      function tickClock(){const d=new Date();$('clock').textContent=fmtTime(d);const seconds=Math.floor((Date.now()-state.start)/1000);$('uptime').textContent=[Math.floor(seconds/3600),Math.floor(seconds%3600/60),seconds%60].map(x=>String(x).padStart(2,'0')).join(':')}
+      $('sessionId').textContent='STG-'+Math.random().toString(36).slice(2,8).toUpperCase();tickClock();setInterval(tickClock,1000);renderQueue();renderLedger();updateMetrics();
+    })();
+  </script>
+</body>
+</html>
