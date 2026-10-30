@@ -27,6 +27,8 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 
 1. System Design Log: [ADR-OPERATIONAL-TRIAGE-PIPELINE](ADR_OPERATIONAL_TRIAGE_PIPELINE.md) [1.74]
     * *Core Architecture:* Comprehensive Technical Solutions Triage explaining the architectural constraints behind migrating regional transit logistics reporting layers off fragile APIs and webhooks into an automated asynchronous staging sandbox.
+   * *Interactive Sandbox Prototype:* [Launch Live Operational Triage Sandbox & Real-Time Backpressure Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/operational-triage-sandbox.html)
+   * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](operational-triage-sandbox.html)
 2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md) [1.74]
     * *Core Architecture:* End-to-end client ingestion perimeter deploying multi-channel webhook receivers, text regex normalization matrices, and automated database upsert gates to prevent duplicate customer records.
 3. Multi-Platform Webhook Perimeter: [INTEGRATION-PIPELINE](INTEGRATION_PIPELINE.md)
