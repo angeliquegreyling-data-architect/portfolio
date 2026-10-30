@@ -31,6 +31,8 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](operational-triage-sandbox.html)
 2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md) [1.74]
     * *Core Architecture:* End-to-end client ingestion perimeter deploying multi-channel webhook receivers, text regex normalization matrices, and automated database upsert gates to prevent duplicate customer records.
+    * *Interactive Sandbox Prototype:* [Launch Live Ingestion Perimeter & Real-Time Deduplication Simulation Console](https://angeliquegreyling-data-architect.github.io/portfolio/onboarding-ingestion-perimeter.html)
+   * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](onboarding-ingestion-perimeter.html)
 3. Multi-Platform Webhook Perimeter: [INTEGRATION-PIPELINE](INTEGRATION_PIPELINE.md)
     * *Core Architecture:* Asynchronous workflow architecture processing cross-system telemetry, parsing structural schema variants, and managing cloud storage file handoffs across secure enterprise systems.
 4. Technical Architecture Framework: [TRANSIT-METRICS-AUTOMATION-PIPELINE](TRANSIT_METRICS_AUTOMATION_PIPELINE.md) [1.74]
