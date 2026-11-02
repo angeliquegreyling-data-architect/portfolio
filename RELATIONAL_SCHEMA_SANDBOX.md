@@ -46,4 +46,3 @@ To sustain lightning-fast calculation speeds under multi-million-row corporate r
 *   **Production Source Code Implementation:** [Review Pure PostgreSQL Relational Schema Script Logic](schema.sql)
 
 ***
-*This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.*
