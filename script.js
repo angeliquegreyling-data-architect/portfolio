@@ -1,26 +1,28 @@
 "use strict";
 
 /* =========================================================
-   LIVE UTC CLOCK CONTROLLER
+   LIVE UTC CLOCK
 ========================================================= */
 
 function updateUtcClock() {
     const clock = document.getElementById("utc-clock");
 
-    if (clock) {
-        clock.textContent = new Date().toISOString();
+    if (!clock) {
+        return;
     }
+
+    clock.textContent = new Date().toISOString();
 }
 
 
 /* =========================================================
-   PORTFOLIO EVENT MATRIX
+   PORTFOLIO INTERACTION CONTROLLER
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
     /* -----------------------------------------------------
-       INITIALISE LIVE CLOCK
+       INITIALISE CLOCK
     ----------------------------------------------------- */
 
     updateUtcClock();
@@ -29,11 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* -----------------------------------------------------
-       EVENT DELEGATION
-       
-       Clicking anywhere on a portfolio card toggles its
-       highlight state. Interactive links and buttons are
-       excluded so that external navigation works normally.
+       EVENT DELEGATION MATRIX
+
+       Clicking on the body of a system card toggles its
+       technical focus state.
+
+       Links and buttons are excluded so that external
+       navigation behaves normally.
     ----------------------------------------------------- */
 
     const portfolioGrid = document.getElementById("portfolio-grid");
@@ -41,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!portfolioGrid) {
         return;
     }
+
 
     portfolioGrid.addEventListener("click", (event) => {
 
@@ -51,21 +56,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        /*
-         * Do not toggle the card when the user clicks an
-         * external link or action button.
-         */
+        /* Do not interfere with navigation links. */
 
-        const interactiveElement = event.target.closest("a, button");
+        const interactiveElement =
+            event.target.closest("a, button");
 
         if (interactiveElement) {
             return;
         }
 
 
-        /*
-         * Toggle focus highlight on the selected system.
-         */
+        /* Toggle technical focus state. */
 
         card.classList.toggle("highlight");
 
