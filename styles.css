@@ -1,11 +1,12 @@
 /* =========================================================
-   DESIGN TOKENS
+   DESIGN VARIABLES
 ========================================================= */
 
 :root {
     --background: #09090b;
     --card-background: #101217;
     --border: #272a32;
+
     --cyan: #22d3ee;
     --violet: #7658A6;
 
@@ -39,7 +40,7 @@ body {
         radial-gradient(
             circle at top right,
             rgba(34, 211, 238, 0.04),
-            transparent 30%
+            transparent 35%
         ),
         var(--background);
 
@@ -54,7 +55,7 @@ body {
         "Segoe UI",
         sans-serif;
 
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
 
@@ -63,8 +64,9 @@ body {
 ========================================================= */
 
 .site-header {
+    padding: 3.5rem 2rem;
+
     border-bottom: 1px solid var(--border);
-    padding: 3rem 2rem;
 }
 
 .header-content {
@@ -74,6 +76,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+
     gap: 2rem;
 }
 
@@ -81,7 +84,9 @@ body {
 .section-label,
 .clock-label,
 .architecture-label,
-.system-number {
+.system-number,
+.case-number,
+.metric-label {
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.14em;
@@ -94,14 +99,30 @@ body {
 }
 
 .site-header h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    line-height: 1.1;
-    letter-spacing: -0.03em;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
 }
 
-.subtitle {
+.professional-title {
+    max-width: 850px;
+
     margin-top: 1rem;
+
     color: var(--text-secondary);
+
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.contact-details {
+    margin-top: 1rem;
+
+    color: var(--text-muted);
+
+    font-size: 0.85rem;
 }
 
 .separator {
@@ -115,11 +136,12 @@ body {
 ========================================================= */
 
 .system-clock {
-    min-width: 240px;
+    min-width: 250px;
 
     padding: 1rem 1.25rem;
 
     background: var(--card-background);
+
     border: 1px solid var(--border);
     border-radius: var(--card-radius);
 }
@@ -129,7 +151,7 @@ body {
 
     color: var(--text-muted);
 
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.4rem;
 }
 
 #utc-clock {
@@ -138,41 +160,132 @@ body {
     font-family:
         "SFMono-Regular",
         Consolas,
-        "Liberation Mono",
         monospace;
 
-    font-size: 0.85rem;
+    font-size: 0.82rem;
 }
 
 
 /* =========================================================
-   MAIN CONTENT
+   MAIN LAYOUT
 ========================================================= */
 
 main {
     width: min(1400px, 100%);
     margin: 0 auto;
 
-    padding: 4rem 2rem 5rem;
+    padding: 4rem 2rem 6rem;
 }
 
-.portfolio-intro {
-    max-width: 850px;
-    margin-bottom: 2.5rem;
+.content-section {
+    margin-bottom: 6rem;
 }
 
-.portfolio-intro h2 {
-    font-size: clamp(1.6rem, 3vw, 2.25rem);
+.section-heading {
+    max-width: 900px;
+
+    margin-bottom: 2rem;
+}
+
+.section-heading h2 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.2;
+
     margin-bottom: 1rem;
 }
 
-.portfolio-intro > p:last-child {
+.section-description {
     color: var(--text-secondary);
 }
 
 
 /* =========================================================
-   CARD GRID
+   EXECUTIVE PROFILE
+========================================================= */
+
+.profile-content {
+    max-width: 1000px;
+
+    padding-left: 1.5rem;
+
+    border-left: 2px solid var(--cyan);
+}
+
+.profile-content p {
+    color: var(--text-secondary);
+
+    font-size: 1rem;
+
+    margin-bottom: 1.25rem;
+}
+
+.profile-content p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   EXPERTISE GRID
+========================================================= */
+
+.expertise-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(250px, 1fr));
+
+    gap: 1rem;
+}
+
+.expertise-card {
+    padding: 1.5rem;
+
+    background: var(--card-background);
+
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+
+    transition:
+        transform var(--transition),
+        border-color var(--transition),
+        box-shadow var(--transition);
+}
+
+.expertise-card:hover {
+    transform: translateY(-4px);
+
+    border-color: var(--violet);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.expertise-number {
+    display: block;
+
+    color: var(--violet);
+
+    font-family: monospace;
+    font-size: 0.75rem;
+
+    margin-bottom: 1rem;
+}
+
+.expertise-card h3 {
+    margin-bottom: 0.75rem;
+
+    font-size: 1rem;
+}
+
+.expertise-card p {
+    color: var(--text-secondary);
+
+    font-size: 0.88rem;
+}
+
+
+/* =========================================================
+   SYSTEM CARD GRID
 ========================================================= */
 
 .card-grid {
@@ -184,16 +297,11 @@ main {
     gap: 1.25rem;
 }
 
-
-/* =========================================================
-   CARD COMPONENT
-========================================================= */
-
 .card {
     display: flex;
     flex-direction: column;
 
-    min-height: 340px;
+    min-height: 350px;
 
     padding: 1.5rem;
 
@@ -218,33 +326,25 @@ main {
     border-color: var(--cyan);
 
     box-shadow:
-        0 0 0 1px rgba(34, 211, 238, 0.12),
+        0 0 0 1px rgba(34, 211, 238, 0.1),
         0 12px 35px rgba(0, 0, 0, 0.25);
 }
-
-.card:focus-visible {
-    border-color: var(--cyan);
-
-    box-shadow:
-        0 0 0 3px rgba(34, 211, 238, 0.18);
-}
-
-
-/* =========================================================
-   ACTIVE / HIGHLIGHT STATE
-========================================================= */
 
 .card.highlight {
     border-color: var(--violet);
 
     box-shadow:
-        0 0 0 1px rgba(118, 88, 166, 0.45),
-        0 0 25px rgba(118, 88, 166, 0.12);
+        0 0 0 1px rgba(118, 88, 166, 0.5),
+        0 0 30px rgba(118, 88, 166, 0.12);
+}
+
+.card:focus-visible {
+    border-color: var(--cyan);
 }
 
 
 /* =========================================================
-   CARD HEADER
+   SYSTEM CARD CONTENT
 ========================================================= */
 
 .card-topline {
@@ -260,27 +360,25 @@ main {
 }
 
 .status-badge {
-    padding: 0.25rem 0.55rem;
+    display: inline-block;
+
+    padding: 0.25rem 0.6rem;
 
     background: rgba(118, 88, 166, 0.2);
-    color: #b9a5df;
 
     border: 1px solid rgba(118, 88, 166, 0.5);
     border-radius: 999px;
+
+    color: #c4b5e5;
 
     font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.1em;
 }
 
-
-/* =========================================================
-   SYSTEM TITLE
-========================================================= */
-
 .card h3 {
-    font-size: 1.05rem;
-    line-height: 1.4;
+    font-size: 1rem;
+    line-height: 1.5;
 
     margin-bottom: 1.5rem;
 
@@ -290,33 +388,20 @@ main {
 .card h3 a {
     color: var(--cyan);
     text-decoration: none;
-
-    transition: opacity var(--transition);
 }
 
 .card h3 a:hover {
-    opacity: 0.75;
+    text-decoration: underline;
 }
 
 .version {
-    display: inline-block;
-
-    margin-left: 0.35rem;
+    margin-left: 0.3rem;
 
     color: var(--text-muted);
 
-    font-family:
-        "SFMono-Regular",
-        Consolas,
-        monospace;
-
+    font-family: monospace;
     font-size: 0.8rem;
 }
-
-
-/* =========================================================
-   ARCHITECTURE DESCRIPTION
-========================================================= */
 
 .architecture {
     flex-grow: 1;
@@ -341,13 +426,13 @@ main {
 .architecture p {
     color: var(--text-secondary);
 
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     font-style: italic;
 }
 
 
 /* =========================================================
-   ACTION BUTTONS
+   BUTTONS
 ========================================================= */
 
 .card-actions {
@@ -363,7 +448,6 @@ main {
     align-items: center;
 
     flex: 1;
-
     min-width: 130px;
 
     padding: 0.7rem 1rem;
@@ -371,7 +455,7 @@ main {
     border: 1px solid var(--border);
     border-radius: 6px;
 
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
 
     text-align: center;
@@ -385,23 +469,145 @@ main {
 
 .button-primary {
     background: var(--cyan);
+
     border-color: var(--cyan);
-    color: #09090b;
+
+    color: var(--background);
 }
 
 .button-primary:hover {
     background: transparent;
+
     color: var(--cyan);
 }
 
 .button-secondary {
     background: transparent;
+
     color: var(--text-secondary);
 }
 
 .button-secondary:hover {
     border-color: var(--violet);
+
     color: #c4b5e5;
+}
+
+
+/* =========================================================
+   CASE STUDIES
+========================================================= */
+
+.case-studies {
+    margin-top: 2rem;
+}
+
+.case-study {
+    margin-bottom: 2rem;
+
+    padding: 2rem;
+
+    background: var(--card-background);
+
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+}
+
+.case-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 2rem;
+
+    margin-bottom: 2rem;
+}
+
+.case-number {
+    display: block;
+
+    color: var(--cyan);
+
+    margin-bottom: 0.5rem;
+}
+
+.case-header h3 {
+    font-size: clamp(1.2rem, 3vw, 1.7rem);
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   CASE STUDY METRICS
+========================================================= */
+
+.metrics-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(200px, 1fr));
+
+    gap: 1px;
+
+    background: var(--border);
+
+    border: 1px solid var(--border);
+
+    margin-bottom: 2rem;
+}
+
+.metric {
+    padding: 1.25rem;
+
+    background: var(--background);
+}
+
+.metric-label {
+    display: block;
+
+    color: var(--text-muted);
+
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    display: block;
+
+    color: var(--text-secondary);
+
+    font-size: 0.88rem;
+}
+
+
+/* =========================================================
+   CASE STUDY CONTENT
+========================================================= */
+
+.case-content {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+
+    gap: 2rem;
+}
+
+.case-block {
+    padding-left: 1rem;
+
+    border-left: 2px solid var(--violet);
+}
+
+.case-block h4 {
+    margin-bottom: 0.75rem;
+
+    font-size: 1rem;
+}
+
+.case-block p {
+    color: var(--text-secondary);
+
+    font-size: 0.92rem;
 }
 
 
@@ -418,12 +624,13 @@ main {
 
     text-align: center;
 
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     letter-spacing: 0.08em;
 }
 
 .site-footer span {
     color: var(--violet);
+
     margin: 0 0.5rem;
 }
 
@@ -432,10 +639,10 @@ main {
    RESPONSIVE DESIGN
 ========================================================= */
 
-@media (max-width: 750px) {
+@media (max-width: 800px) {
 
     .site-header {
-        padding: 2rem 1.25rem;
+        padding: 2.5rem 1.25rem;
     }
 
     .header-content {
@@ -448,15 +655,18 @@ main {
     }
 
     main {
-        padding:
-            3rem 1.25rem
-            4rem;
+        padding: 3rem 1.25rem 4rem;
+    }
+
+    .case-header {
+        flex-direction: column;
+        gap: 1rem;
     }
 
 }
 
 
-@media (max-width: 450px) {
+@media (max-width: 500px) {
 
     .card-grid {
         grid-template-columns: 1fr;
@@ -468,6 +678,14 @@ main {
 
     .button {
         width: 100%;
+    }
+
+    .case-study {
+        padding: 1.25rem;
+    }
+
+    .contact-details {
+        line-height: 1.8;
     }
 
 }
