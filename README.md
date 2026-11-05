@@ -27,28 +27,33 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 
 1. System Design Log: [ADR-OPERATIONAL-TRIAGE-PIPELINE](ADR_OPERATIONAL_TRIAGE_PIPELINE.md) [1.74]
     * *Core Architecture:* Comprehensive Technical Solutions Triage explaining the architectural constraints behind migrating regional transit logistics reporting layers off fragile APIs and webhooks into an automated asynchronous staging sandbox.
-   * *Interactive Sandbox Prototype:* [Launch Live Operational Triage Sandbox & Real-Time Backpressure Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/operational-triage-sandbox.html)
-   * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](operational-triage-sandbox.html)
+    * *Interactive Sandbox Prototype:* [Launch Live Operational Triage Sandbox & Real-Time Backpressure Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/operational-triage-sandbox.html)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+
 2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md) [1.74]
     * *Core Architecture:* End-to-end client ingestion perimeter deploying multi-channel webhook receivers, text regex normalization matrices, and automated database upsert gates to prevent duplicate customer records.
     * *Interactive Sandbox Prototype:* [Launch Live Ingestion Perimeter & Real-Time Deduplication Simulation Console](https://angeliquegreyling-data-architect.github.io/portfolio/onboarding-ingestion-perimeter.html)
-   * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](onboarding-ingestion-perimeter.html)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+
 3. Multi-Platform Webhook Perimeter: [INTEGRATION-PIPELINE](INTEGRATION_PIPELINE.md)
-    * *Core Architecture:* Asynchronous workflow architecture processing cross-system telemetry, parsing structural schema variants, and managing cloud storage file handoffs across secure enterprise.
+    * *Core Architecture:* Asynchronous workflow architecture processing cross-system telemetry, parsing structural schema variants, and managing cloud storage file handoffs across secure enterprise systems.
     * *Interactive Sandbox Prototype:* [Launch Live Schema Variant Ingestion Sandbox & Real-Time Transformation Hub](https://angeliquegreyling-data-architect.github.io/portfolio/schema-variant-playground.html)
-   * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](schema-variant-playground.html)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+
 4. Technical Architecture Framework: [TRANSIT-METRICS-AUTOMATION-PIPELINE](TRANSIT_METRICS_AUTOMATION_PIPELINE.md) [1.74]
     * *Core Architecture:* Automated multi-layer data extraction pipeline integrating custom TypeScript/Office Scripts to handle structural spreadsheet data modifications, unmerge grid headers, and optimize data models for downstream Power BI semantic layer ingestion.
     * *Interactive Sandbox Prototype:* [Launch Live Ingestion Sandbox & Real-Time Processing Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-data-ingestion-staging-sandbox-v2.html)
-    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](enterprise-data-ingestion-staging-sandbox-v2.html)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+
 5. Zero-Code Automation Matrix: [ZAPIER-PIPELINE](ZAPIER_PIPELINE.md)
     * *Core Architecture:* Production monitoring array automating cross-platform incident tracking, ticketing distributions, and real-time operational status updates across remote team management channels.
-   * *Interactive Sandbox Prototype:* [Launch Live Incident Intake Dashboard & Conditional Router Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/incident-dashboard.html)
-   * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](incident-dashboard.html)
+    * *Interactive Sandbox Prototype:* [Launch Live Incident Intake Dashboard & Conditional Router Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/incident-dashboard.html)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+
 6. Relational Schema Database Sandbox: [RELATIONAL-SCHEMA-SANDBOX](RELATIONAL_SCHEMA_SANDBOX.md) [1.74]
     * *Core Architecture:* Enterprise-grade PostgreSQL data schema manifest demonstrating 3NF relational design, dimensional star-schema data modeling, composite foreign-key assignments, and database indexes optimized for performance tracking.
     * *Interactive Sandbox Prototype:* [Launch Live ERD Explorer & SQL Query Analyzer Sandbox](https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-database-erd-analyzer-sandbox.html)
-    * *Source Code Implementation:* [Review Pure PostgreSQL Relational Schema Script Logic](schema.sql)
+    * *Source Code Implementation:* [Review Pure PostgreSQL Relational Schema Script Logic](https://githubusercontent.com)
 
 ---
 
