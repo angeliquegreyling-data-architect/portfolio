@@ -33,12 +33,12 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 2. Production Automation Engine: [ENTERPRISE-ONBOARDING-PIPELINE](ENTERPRISE_ONBOARDING_PIPELINE.md) [1.74]
     * *Core Architecture:* End-to-end client ingestion perimeter deploying multi-channel webhook receivers, text regex normalization matrices, and automated database upsert gates to prevent duplicate customer records.
     * *Interactive Sandbox Prototype:* [Launch Live Ingestion Perimeter & Real-Time Deduplication Simulation Console](https://angeliquegreyling-data-architect.github.io/portfolio/onboarding-ingestion-perimeter.html)
-    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://github.com/angeliquegreyling-data-architect/portfolio/blob/main/onboarding-ingestion-perimeter.html)
 
 3. Multi-Platform Webhook Perimeter: [INTEGRATION-PIPELINE](INTEGRATION_PIPELINE.md)
     * *Core Architecture:* Asynchronous workflow architecture processing cross-system telemetry, parsing structural schema variants, and managing cloud storage file handoffs across secure enterprise systems.
     * *Interactive Sandbox Prototype:* [Launch Live Schema Variant Ingestion Sandbox & Real-Time Transformation Hub](https://angeliquegreyling-data-architect.github.io/portfolio/schema-variant-playground.html)
-    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://github.com/angeliquegreyling-data-architect/portfolio/blob/main/schema-variant-playground.html)
 
 4. Technical Architecture Framework: [TRANSIT-METRICS-AUTOMATION-PIPELINE](TRANSIT_METRICS_AUTOMATION_PIPELINE.md) [1.74]
     * *Core Architecture:* Automated multi-layer data extraction pipeline integrating custom TypeScript/Office Scripts to handle structural spreadsheet data modifications, unmerge grid headers, and optimize data models for downstream Power BI semantic layer ingestion.
