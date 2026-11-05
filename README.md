@@ -48,7 +48,7 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 5. Zero-Code Automation Matrix: [ZAPIER-PIPELINE](ZAPIER_PIPELINE.md)
     * *Core Architecture:* Production monitoring array automating cross-platform incident tracking, ticketing distributions, and real-time operational status updates across remote team management channels.
     * *Interactive Sandbox Prototype:* [Launch Live Incident Intake Dashboard & Conditional Router Simulation Canvas](https://angeliquegreyling-data-architect.github.io/portfolio/incident-dashboard.html)
-    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://githubusercontent.com)
+    * *Source Code Implementation:* [Review Pure HTML5/JavaScript Technical Script Logic](https://github.com/angeliquegreyling-data-architect/portfolio/blob/main/incident-dashboard.html)
 
 6. Relational Schema Database Sandbox: [RELATIONAL-SCHEMA-SANDBOX](RELATIONAL_SCHEMA_SANDBOX.md) [1.74]
     * *Core Architecture:* Enterprise-grade PostgreSQL data schema manifest demonstrating 3NF relational design, dimensional star-schema data modeling, composite foreign-key assignments, and database indexes optimized for performance tracking.
