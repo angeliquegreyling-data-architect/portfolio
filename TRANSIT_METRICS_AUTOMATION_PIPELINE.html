@@ -1,990 +1,206 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Automated Enterprise Snapshot Aggregator & Analytics Framework</title>
-
-    <style>
-
-        /* =====================================================
-           DESIGN VARIABLES
-        ====================================================== */
-
-        :root {
-            --background: #09090b;
-            --surface: #101217;
-            --surface-light: #161922;
-            --border: #272a32;
-
-            --cyan: #22d3ee;
-            --violet: #7658A6;
-
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-
-            --success: #22c55e;
-
-            --radius: 10px;
-            --transition: 0.25s ease;
-        }
-
-
-        /* =====================================================
-           GLOBAL RESET
-        ====================================================== */
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            min-height: 100vh;
-
-            background:
-                radial-gradient(
-                    circle at top right,
-                    rgba(34, 211, 238, 0.04),
-                    transparent 30%
-                ),
-                var(--background);
-
-            color: var(--text-primary);
-
-            font-family:
-                Inter,
-                ui-sans-serif,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
-            line-height: 1.7;
-        }
-
-
-        /* =====================================================
-           PAGE CONTAINER
-        ====================================================== */
-
-        .container {
-            width: min(1200px, calc(100% - 2.5rem));
-            margin: 0 auto;
-
-            padding: 4rem 0 6rem;
-        }
-
-
-        /* =====================================================
-           DOCUMENT HEADER
-        ====================================================== */
-
-        .document-header {
-            padding-bottom: 2.5rem;
-
-            border-bottom: 1px solid var(--border);
-
-            margin-bottom: 4rem;
-        }
-
-        .eyebrow {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            max-width: 1000px;
-
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-
-            margin-bottom: 1rem;
-        }
-
-        .subtitle {
-            color: var(--violet);
-
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-
-            margin-bottom: 1.75rem;
-        }
-
-        .overview {
-            max-width: 900px;
-
-            color: var(--text-secondary);
-
-            font-size: 1.05rem;
-        }
-
-
-        /* =====================================================
-           GENERAL SECTION STYLING
-        ====================================================== */
-
-        section {
-            margin-bottom: 4rem;
-        }
-
-        .section-label {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 0.75rem;
-        }
-
-        h2 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-
-            margin-bottom: 1.5rem;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-
-            margin-bottom: 1rem;
-        }
-
-        p {
-            color: var(--text-secondary);
-        }
-
-
-        /* =====================================================
-           INBOUND ARCHITECTURE MAP
-        ====================================================== */
-
-        .architecture-map {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(210px, 1fr));
-
-            gap: 1rem;
-        }
-
-        .architecture-node {
-            position: relative;
-
-            min-height: 180px;
-
-            padding: 1.5rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            transition:
-                transform var(--transition),
-                border-color var(--transition),
-                box-shadow var(--transition);
-        }
-
-        .architecture-node:hover {
-            transform: translateY(-4px);
-
-            border-color: var(--cyan);
-
-            box-shadow:
-                0 0 25px rgba(34, 211, 238, 0.08);
-        }
-
-        .node-number {
-            display: block;
-
-            color: var(--violet);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 1rem;
-        }
-
-        .architecture-node h3 {
-            color: var(--text-primary);
-
-            font-size: 1rem;
-            line-height: 1.4;
-        }
-
-        .architecture-node p {
-            font-size: 0.88rem;
-        }
-
-
-        /* =====================================================
-           SPECIFICATION CARDS
-        ====================================================== */
-
-        .specification-card {
-            padding: 2rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            margin-bottom: 2rem;
-        }
-
-        .specification-header {
-            padding-bottom: 1.5rem;
-
-            border-bottom: 1px solid var(--border);
-
-            margin-bottom: 1.5rem;
-        }
-
-        .specification-number {
-            display: block;
-
-            color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 0.5rem;
-        }
-
-        .specification-header h2 {
-            margin-bottom: 0;
-        }
-
-
-        /* =====================================================
-           TECHNICAL CALLOUTS
-        ====================================================== */
-
-        .technical-callout {
-            margin-top: 1.5rem;
-
-            padding: 1.25rem;
-
-            background: var(--surface-light);
-
-            border-left: 3px solid var(--violet);
-        }
-
-        .technical-callout strong {
-            display: block;
-
-            color: var(--text-primary);
-
-            margin-bottom: 0.5rem;
-        }
-
-
-        /* =====================================================
-           CODE BLOCK
-        ====================================================== */
-
-        .code-container {
-            margin-top: 1.5rem;
-
-            background: #08090c;
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            padding: 0.75rem 1rem;
-
-            background: var(--surface-light);
-
-            border-bottom: 1px solid var(--border);
-        }
-
-        .code-language {
-            color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .code-label {
-            color: var(--text-muted);
-
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-        }
-
-        pre {
-            overflow-x: auto;
-
-            padding: 1.5rem;
-
-            color: #d4d4d8;
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-size: 0.82rem;
-            line-height: 1.7;
-        }
-
-        code {
-            font-family: inherit;
-        }
-
-
-        /* =====================================================
-           ANALYTICS FLOW
-        ====================================================== */
-
-        .analytics-flow {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
-
-            gap: 1rem;
-
-            margin-top: 1.5rem;
-        }
-
-        .analytics-step {
-            padding: 1.5rem;
-
-            background: var(--surface-light);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            transition:
-                transform var(--transition),
-                border-color var(--transition);
-        }
-
-        .analytics-step:hover {
-            transform: translateY(-3px);
-
-            border-color: var(--cyan);
-        }
-
-        .analytics-step span {
-            display: block;
-
-            color: var(--success);
-
-            font-family: monospace;
-            font-size: 0.7rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .analytics-step h3 {
-            font-size: 1rem;
-        }
-
-        .analytics-step p {
-            font-size: 0.88rem;
-        }
-
-
-        /* =====================================================
-           TECHNOLOGY TAGS
-        ====================================================== */
-
-        .stack-tags {
-            display: flex;
-            flex-wrap: wrap;
-
-            gap: 0.6rem;
-
-            margin-top: 1.5rem;
-        }
-
-        .stack-tag {
-            padding: 0.35rem 0.7rem;
-
-            background: rgba(34, 211, 238, 0.05);
-
-            border: 1px solid var(--border);
-            border-radius: 999px;
-
-            color: var(--text-secondary);
-
-            font-size: 0.75rem;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ====================================================== */
-
-        footer {
-            padding-top: 2rem;
-
-            border-top: 1px solid var(--border);
-
-            color: var(--text-muted);
-
-            font-size: 0.72rem;
-            letter-spacing: 0.08em;
-
-            text-align: center;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE DESIGN
-        ====================================================== */
-
-        @media (max-width: 700px) {
-
-            .container {
-                width: min(100% - 2rem, 1200px);
-
-                padding-top: 2.5rem;
-            }
-
-            .specification-card {
-                padding: 1.25rem;
-            }
-
-            pre {
-                padding: 1rem;
-
-                font-size: 0.72rem;
-            }
-
-        }
-
-    </style>
+    <meta name="description" content="Automated Enterprise Snapshot Aggregator and Analytics Framework - Technical Architecture Specification and Automated Spreadsheet Normalization Pipeline.">
+    <title>Automated Enterprise Snapshot Aggregator | Angelique Greyling</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
-
 <body>
-
-    <main class="container">
-
-
-        <!-- =====================================================
-             DOCUMENT HEADER
-        ====================================================== -->
-
-        <header class="document-header">
-
-            <p class="eyebrow">
-                ENTERPRISE AUTOMATION // ANALYTICS ARCHITECTURE
-            </p>
-
-            <h1>
-                Automated Enterprise Snapshot Aggregator &amp; Analytics Framework
-            </h1>
-
-            <p class="subtitle">
-                Technical Architecture Specification &amp;
-                Automated Spreadsheet Normalization Pipeline
-            </p>
-
-            <p class="overview">
-                This infrastructure specification outlines a
-                production-grade automated pipeline designed to ingest
-                daily operational snapshot reporting data, handle
-                multi-source data transformations, and generate
-                structured data models optimized for executive-ready
-                analytical dashboards.
-            </p>
-
-        </header>
-
-
-        <!-- =====================================================
-             INBOUND ARCHITECTURE MAP
-        ====================================================== -->
-
-        <section>
-
-            <p class="section-label">
-                SYSTEM MAP // INBOUND ARCHITECTURE
-            </p>
-
-            <h2>
-                Automated Data Processing Architecture
-            </h2>
-
-
-            <div class="architecture-map">
-
-
-                <!-- DATA SOURCE -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 01
-                    </span>
-
-                    <h3>
-                        Data Source
-                    </h3>
-
-                    <p>
-                        Operational data captured through automated
-                        form endpoints.
-                    </p>
-
-                </article>
-
-
-                <!-- EXTRACTION -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 02
-                    </span>
-
-                    <h3>
-                        Data Extraction Layer
-                    </h3>
-
-                    <p>
-                        Proxy scripts monitoring mailboxes and
-                        extracting report files.
-                    </p>
-
-                </article>
-
-
-                <!-- STORAGE -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 03
-                    </span>
-
-                    <h3>
-                        Intermediate Storage
-                    </h3>
-
-                    <p>
-                        Google Drive for raw snapshots and SharePoint
-                        for the processed ledger.
-                    </p>
-
-                </article>
-
-
-                <!-- AUTOMATION -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 04
-                    </span>
-
-                    <h3>
-                        Automation Processing
-                    </h3>
-
-                    <p>
-                        Power Automate orchestration and TypeScript
-                        table formatting.
-                    </p>
-
-                </article>
-
-
-                <!-- ANALYTICS -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 05
-                    </span>
-
-                    <h3>
-                        Analytics Visualization
-                    </h3>
-
-                    <p>
-                        Power BI models and cloud scheduled refreshes.
-                    </p>
-
-                </article>
-
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <header class="site-header">
+        <div class="header-content">
+            <div class="title-block">
+                <p class="eyebrow">SYSTEM LOG // SYSTEM 04</p>
+                <h1>Automated Enterprise Snapshot Aggregator &amp; Analytics Framework</h1>
+                <p class="professional-title">Technical Architecture Specification &amp; Automated Spreadsheet Normalization Pipeline</p>
+                <div class="contact-details">
+                    <span><strong>Architect:</strong> Angelique Greyling (Principal Solutions Engineer)</span>
+                    <span class="separator">|</span>
+                    <span><strong>Environment:</strong> Multi-Source Operational Data Aggregation &amp; Analytics Framework</span>
+                </div>
             </div>
-
-
-            <div class="stack-tags">
-
-                <span class="stack-tag">
-                    Automated Forms
-                </span>
-
-                <span class="stack-tag">
-                    Google Apps Script
-                </span>
-
-                <span class="stack-tag">
-                    Google Drive
-                </span>
-
-                <span class="stack-tag">
-                    Power Automate
-                </span>
-
-                <span class="stack-tag">
-                    Office Scripts
-                </span>
-
-                <span class="stack-tag">
-                    SharePoint
-                </span>
-
-                <span class="stack-tag">
-                    Power BI
-                </span>
-
+            <div class="system-clock">
+                <span class="clock-label">STATUS</span>
+                <span class="status-badge" style="background: rgba(34, 211, 238, 0.1); border-color: var(--cyan); color: var(--cyan);">AUTOMATED / OPERATIONAL</span>
             </div>
+        </div>
+    </header>
 
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+    <main>
+        <!-- SYSTEM CONTEXT & PIPELINE TOPOLOGY -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">01 // SYSTEM TOPOLOGY</p>
+                <h2>Inbound Architecture &amp; Pipeline Flow</h2>
+            </div>
+            <div style="background: var(--card-background); border: 1px solid var(--border); padding: 2rem; border-radius: var(--card-radius); font-family: monospace; white-space: pre; overflow-x: auto; color: var(--cyan); line-height: 1.4; font-size: 0.9rem;">
+ [OPERATIONAL FORM ENDPOINTS]
+          │
+          ▼
+ [INBOUND DATA EXTRACTION LAYER]
+   • Mailbox Monitoring
+   • Attachment Extraction
+          │
+          ▼
+ [GOOGLE DRIVE]
+   • Raw Snapshot Archive
+          │
+          ▼
+ [POWER AUTOMATE ORCHESTRATION]
+          │
+          ▼
+ [TYPESCRIPT / OFFICE SCRIPTS]
+   • Header Normalization
+   • Grid Unmerging
+   • Structured Table Generation
+          │
+          ▼
+ [SHAREPOINT]
+   • Processed Operational Ledger
+          │
+          ▼
+ [POWER BI ANALYTICS LAYER]
+   • Data Models
+   • Incremental Refresh
+   • Executive Dashboards</div>
         </section>
 
-
-        <!-- =====================================================
-             SECTION 01
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <div class="specification-header">
-
-                <span class="specification-number">
-                    SPECIFICATION 01 // EXTRACTION
-                </span>
-
-                <h2>
-                    Automated Extraction &amp; Repository Management
-                </h2>
-
+        <!-- AUTOMATED EXTRACTION & REPOSITORY MANAGEMENT -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">02 // DATA EXTRACTION &amp; REPOSITORY GOVERNANCE</p>
+                <h2>Automated Extraction &amp; Repository Management</h2>
             </div>
-
-
-            <p>
-                The pipeline replaces manual extraction loops with an
-                automated scripting proxy. A dedicated script monitors
-                the inbound data inbox, captures incoming spreadsheet
-                attachments, commits the raw snapshot rows directly into
-                an archival folder structure, and clears the processed
-                message container to isolate the transaction and prevent
-                multi-pass file duplication.
-            </p>
-
-
-            <div class="technical-callout">
-
-                <strong>
-                    Architectural Objective
-                </strong>
-
-                <p>
-                    Raw snapshots are retained separately from downstream
-                    processed records, creating a clear boundary between
-                    source data preservation and analytical data
-                    transformation.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             SECTION 02
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <div class="specification-header">
-
-                <span class="specification-number">
-                    SPECIFICATION 02 // NORMALIZATION
-                </span>
-
-                <h2>
-                    TypeScript Data Normalization Loop
-                </h2>
-
-            </div>
-
-
-            <p>
-                Upon repository file drop detection, an automated
-                workflow calls a custom TypeScript Office Script to
-                standardize unstructured grid data into clean tables
-                before downstream analytics systems query the row models.
-            </p>
-
-
-            <!-- CODE BLOCK -->
-
-            <div class="code-container">
-
-                <div class="code-header">
-
-                    <span class="code-language">
-                        TYPESCRIPT
-                    </span>
-
-                    <span class="code-label">
-                        OFFICE SCRIPT // NORMALIZATION ENGINE
-                    </span>
-
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Automated Inbound Extraction</h4>
+                    <p>The pipeline replaces manual spreadsheet extraction procedures with an automated scripting proxy. A dedicated script monitors the inbound data mailbox, identifies incoming operational report attachments, and programmatically captures the associated spreadsheet files for downstream processing.</p>
                 </div>
 
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Raw Snapshot Archival</h4>
+                    <p>Extracted report attachments are committed directly into a structured archival folder hierarchy within Google Drive. The raw snapshot repository preserves the original incoming reporting artifacts independently of subsequent transformation operations, providing a historical reference point for reconciliation and operational audit requirements.</p>
+                </div>
 
-                <pre><code>function main(workbook: ExcelScript.Workbook) {
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Transaction Isolation &amp; Duplicate Prevention</h4>
+                    <p>Following successful attachment extraction and archival, the processed message container is cleared. This isolates completed ingestion transactions from subsequent mailbox monitoring cycles and prevents previously processed messages from repeatedly entering the extraction sequence, reducing the risk of multi-pass file duplication.</p>
+                </div>
+            </div>
+        </section>
 
-    // Access target data sheet layer
-    let targetSheet = workbook.getActiveWorksheet();
-    let usedRange = targetSheet.getUsedRange();
+        <!-- TYPESCRIPT DATA NORMALIZATION -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">03 // AUTOMATED TRANSFORMATION ENGINEERING</p>
+                <h2>TypeScript Data Normalization Loop (Office Scripts)</h2>
+            </div>
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Automated Processing Trigger</h4>
+                    <p>Upon detection of a new repository file drop, the automated workflow invokes a custom TypeScript execution block through Office Scripts. The transformation engine accesses the target workbook, identifies the active worksheet and retrieves its used data range before initiating structural normalization operations.</p>
+                </div>
 
-    if (usedRange) {
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Structural Grid Normalization</h4>
+                    <p>The script identifies the populated worksheet boundaries through <code>getUsedRange()</code> and retrieves the active row and column dimensions. It then executes an <code>unmerge()</code> operation across the used range, removing nested layout block headers and restoring a consistent tabular structure for downstream transformation.</p>
+                </div>
 
-        let rowCount = usedRange.getRowCount();
-        let colCount = usedRange.getColumnCount();
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Algorithmic Header Sanitization</h4>
+                    <p>A column traversal loop reads the first-row header value for each populated column. Non-empty header values are normalized through whitespace trimming, lowercase conversion and whitespace replacement using <code>trim().toLowerCase().replace(/\s+/g, '_')</code>. This establishes consistent field naming conventions and reduces structural inconsistency caused by variations in incoming spreadsheet headers.</p>
+                </div>
 
-        // Unmerge nested layout block headers
-        // to clean the table space
-        usedRange.unmerge();
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">4. Canonical Table Object Generation</h4>
+                    <p>Following header normalization, the sanitized worksheet range is converted into a structured Excel Table Object through <code>workbook.addTable()</code>. The resulting table is assigned the canonical identifier <code>Canonical_Operational_Ledger</code>, establishing a standardized tabular contract for subsequent automation and analytical consumption.</p>
+                </div>
 
-        // Algorithmic column normalization
-        for (let col = 0; col &lt; colCount; col++) {
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">5. TypeScript Execution Reference</h4>
+                    <p>The following Office Script implements the worksheet access, structural unmerging, header sanitization and canonical table generation sequence.</p>
 
-            let firstHeaderValue =
-                targetSheet
-                    .getCell(0, col)
-                    .getValue() as string;
+                    <div style="background: var(--card-background); border: 1px solid var(--border); padding: 1.5rem; border-radius: var(--card-radius); overflow-x: auto; margin-top: 1rem;">
+                        <pre style="font-family: monospace; color: var(--cyan); font-size: 0.82rem; line-height: 1.6; white-space: pre; margin: 0;"><code>function main(workbook: ExcelScript.Workbook) {
+  // Access target data sheet layer
+  let targetSheet = workbook.getActiveWorksheet();
+  let usedRange = targetSheet.getUsedRange();
 
-            // Clean and normalize column header names
-            if (firstHeaderValue) {
+  if (usedRange) {
+    let rowCount = usedRange.getRowCount();
+    let colCount = usedRange.getColumnCount();
 
-                let sanitizedHeader =
-                    firstHeaderValue
-                        .trim()
-                        .toLowerCase()
-                        .replace(/\s+/g, '_');
+    // Unmerge nested layout block headers
+    usedRange.unmerge();
 
-                targetSheet
-                    .getCell(0, col)
-                    .setValue(sanitizedHeader);
-            }
-        }
+    // Algorithmic downward text fill
+    for (let col = 0; col &lt; colCount; col++) {
+      let firstHeaderValue =
+        targetSheet.getCell(0, col).getValue() as string;
 
-        // Force sanitized data into a
-        // structured Table Object mapping contract
-        let activeTable =
-            workbook.addTable(
-                usedRange.getAddress(),
-                true
-            );
+      // Normalize column header names
+      if (firstHeaderValue) {
+        let sanitizedHeader = firstHeaderValue
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '_');
 
-        activeTable.setName(
-            "Canonical_Operational_Ledger"
-        );
+        targetSheet.getCell(0, col).setValue(sanitizedHeader);
+      }
     }
+
+    // Generate canonical structured table
+    let activeTable = workbook.addTable(
+      usedRange.getAddress(),
+      true
+    );
+
+    activeTable.setName("Canonical_Operational_Ledger");
+  }
 }</code></pre>
-
+                    </div>
+                </div>
             </div>
-
-
-            <div class="technical-callout">
-
-                <strong>
-                    Canonical Data Contract
-                </strong>
-
-                <p>
-                    The normalization process converts a variable,
-                    presentation-oriented spreadsheet layout into the
-                    structured
-                    <code>Canonical_Operational_Ledger</code> table
-                    contract, providing a consistent boundary for
-                    downstream processing and analytics.
-                </p>
-
-            </div>
-
         </section>
 
-
-        <!-- =====================================================
-             SECTION 03
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <div class="specification-header">
-
-                <span class="specification-number">
-                    SPECIFICATION 03 // ANALYTICS
-                </span>
-
-                <h2>
-                    Power BI Analytical Modeling Layer
-                </h2>
-
+        <!-- POWER BI ANALYTICAL MODELING -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">04 // ANALYTICAL MODELING &amp; DELIVERY</p>
+                <h2>Power BI Analytical Modeling Layer</h2>
             </div>
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Structured Data Publication</h4>
+                    <p>The normalized operational table is published directly into a secure corporate SharePoint workspace. This establishes a centralized processed ledger that separates raw snapshot archival from the standardized dataset consumed by downstream analytical systems.</p>
+                </div>
 
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Incremental Refresh Architecture</h4>
+                    <p>Power BI connects to the published workspace records and executes scheduled incremental refresh operations against the structured dataset. By consuming pre-normalized table structures, the analytical layer avoids repeatedly processing complex spreadsheet layout modifications during downstream data model refresh operations.</p>
+                </div>
 
-            <p>
-                The structural table is published directly into a secure
-                corporate workspace where Power BI executes scheduled
-                refreshes against the processed records. Complex
-                spreadsheet modifications are handled upstream within the
-                automation layer, allowing the analytical model to remain
-                focused on semantic calculations and executive reporting.
-            </p>
-
-
-            <div class="analytics-flow">
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 01
-                    </span>
-
-                    <h3>
-                        Structured Ledger
-                    </h3>
-
-                    <p>
-                        Normalized snapshot records are committed to the
-                        processed repository.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 02
-                    </span>
-
-                    <h3>
-                        Scheduled Refresh
-                    </h3>
-
-                    <p>
-                        Power BI retrieves structured records through
-                        automated workspace refresh processes.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 03
-                    </span>
-
-                    <h3>
-                        Semantic Modeling
-                    </h3>
-
-                    <p>
-                        The analytical model remains lightweight and
-                        focused on business logic and DAX calculations.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 04
-                    </span>
-
-                    <h3>
-                        Executive Analytics
-                    </h3>
-
-                    <p>
-                        Final dashboards deliver structured operational
-                        insights for management review.
-                    </p>
-
-                </article>
-
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Analytical Processing Optimization</h4>
+                    <p>Complex structural data modifications are handled upstream within the TypeScript normalization loop, allowing the Power BI semantic model to remain comparatively lightweight and focused on analytical execution. This separates ingestion and transformation responsibilities from business intelligence calculations, preserving analytical capacity for complex DAX measures, management reporting and executive dashboard delivery.</p>
+                </div>
             </div>
-
-
-            <div class="technical-callout">
-
-                <strong>
-                    Processing Boundary Principle
-                </strong>
-
-                <p>
-                    Complex structural transformations are completed before
-                    data reaches the analytics layer. This separation keeps
-                    reporting models faster, reduces transformation
-                    overhead, and allows the semantic layer to concentrate
-                    on analytical calculations rather than source-file
-                    remediation.
-                </p>
-
-            </div>
-
         </section>
-
-
-        <!-- =====================================================
-             FOOTER
-        ====================================================== -->
-
-        <footer>
-
-            AUTOMATED ENTERPRISE SNAPSHOT AGGREGATOR
-            &nbsp; // &nbsp;
-            ANALYTICS FRAMEWORK SPECIFICATION
-            &nbsp; // &nbsp;
-            ANGELIQUE GREYLING
-
-        </footer>
-
     </main>
 
+    <!-- =========================================================
+         FOOTER
+    ========================================================== -->
+    <footer class="site-footer">
+        <p>ANGELIQUE GREYLING | SOLUTIONS PORTFOLIO SYSTEM LOGS</p>
+    </footer>
 </body>
 </html>
