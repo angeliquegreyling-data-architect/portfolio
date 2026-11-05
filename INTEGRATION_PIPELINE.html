@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Automated Enterprise Snapshot Aggregator & Analytics Framework</title>
+    <title>Enterprise Data Integration Pipeline & Routing Architecture</title>
 
     <style>
 
@@ -26,6 +26,8 @@
             --text-muted: #71717a;
 
             --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #f87171;
 
             --radius: 10px;
             --transition: 0.25s ease;
@@ -124,15 +126,53 @@
             letter-spacing: 0.04em;
             text-transform: uppercase;
 
-            margin-bottom: 1.75rem;
+            margin-bottom: 2rem;
         }
 
-        .overview {
-            max-width: 900px;
 
+        /* =====================================================
+           SYSTEM METADATA
+        ====================================================== */
+
+        .metadata-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 1px;
+
+            background: var(--border);
+
+            border: 1px solid var(--border);
+        }
+
+        .metadata-item {
+            padding: 1.25rem;
+
+            background: var(--surface);
+        }
+
+        .metadata-label {
+            display: block;
+
+            color: var(--text-muted);
+
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-value {
             color: var(--text-secondary);
 
-            font-size: 1.05rem;
+            font-size: 0.9rem;
+        }
+
+        .status-operational {
+            color: var(--success);
         }
 
 
@@ -166,28 +206,34 @@
             margin-bottom: 1rem;
         }
 
+        h4 {
+            font-size: 0.95rem;
+
+            margin-bottom: 0.75rem;
+        }
+
         p {
             color: var(--text-secondary);
         }
 
 
         /* =====================================================
-           INBOUND ARCHITECTURE MAP
+           PIPELINE EXECUTION FLOW
         ====================================================== */
 
-        .architecture-map {
+        .pipeline-flow {
             display: grid;
 
             grid-template-columns:
-                repeat(auto-fit, minmax(210px, 1fr));
+                repeat(auto-fit, minmax(240px, 1fr));
 
             gap: 1rem;
         }
 
-        .architecture-node {
+        .pipeline-stage {
             position: relative;
 
-            min-height: 180px;
+            min-height: 210px;
 
             padding: 1.5rem;
 
@@ -202,7 +248,7 @@
                 box-shadow var(--transition);
         }
 
-        .architecture-node:hover {
+        .pipeline-stage:hover {
             transform: translateY(-4px);
 
             border-color: var(--cyan);
@@ -211,7 +257,7 @@
                 0 0 25px rgba(34, 211, 238, 0.08);
         }
 
-        .node-number {
+        .stage-number {
             display: block;
 
             color: var(--violet);
@@ -222,34 +268,48 @@
             margin-bottom: 1rem;
         }
 
-        .architecture-node h3 {
+        .pipeline-stage h3 {
             color: var(--text-primary);
 
-            font-size: 1rem;
             line-height: 1.4;
         }
 
-        .architecture-node p {
+        .pipeline-stage p {
             font-size: 0.88rem;
+        }
+
+        .stage-arrow {
+            color: var(--cyan);
+
+            font-size: 1.5rem;
+            text-align: center;
+
+            margin: 1rem 0;
         }
 
 
         /* =====================================================
-           SPECIFICATION CARDS
+           STAGE SPECIFICATION CARDS
         ====================================================== */
 
-        .specification-card {
+        .stage-specification {
+            margin-bottom: 2rem;
+
             padding: 2rem;
 
             background: var(--surface);
 
             border: 1px solid var(--border);
             border-radius: var(--radius);
-
-            margin-bottom: 2rem;
         }
 
-        .specification-header {
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            gap: 2rem;
+
             padding-bottom: 1.5rem;
 
             border-bottom: 1px solid var(--border);
@@ -257,8 +317,8 @@
             margin-bottom: 1.5rem;
         }
 
-        .specification-number {
-            display: block;
+        .stage-tag {
+            display: inline-block;
 
             color: var(--cyan);
 
@@ -268,26 +328,74 @@
             margin-bottom: 0.5rem;
         }
 
-        .specification-header h2 {
+        .stage-header h2 {
             margin-bottom: 0;
+        }
+
+        .stage-status {
+            padding: 0.3rem 0.65rem;
+
+            background: rgba(118, 88, 166, 0.15);
+
+            border: 1px solid rgba(118, 88, 166, 0.45);
+            border-radius: 999px;
+
+            color: #c4b5e5;
+
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
         }
 
 
         /* =====================================================
-           TECHNICAL CALLOUTS
+           SUBSECTIONS
         ====================================================== */
 
-        .technical-callout {
-            margin-top: 1.5rem;
-
-            padding: 1.25rem;
-
-            background: var(--surface-light);
-
-            border-left: 3px solid var(--violet);
+        .technical-block {
+            margin-bottom: 2rem;
         }
 
-        .technical-callout strong {
+        .technical-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .block-label {
+            display: block;
+
+            color: var(--violet);
+
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+
+            margin-bottom: 0.5rem;
+        }
+
+
+        /* =====================================================
+           ARCHITECTURAL RULES
+        ====================================================== */
+
+        .rules-list {
+            display: grid;
+
+            gap: 1rem;
+
+            list-style: none;
+
+            margin-top: 1.25rem;
+        }
+
+        .rule-item {
+            padding: 1.25rem;
+
+            background: rgba(255, 255, 255, 0.015);
+
+            border-left: 2px solid var(--cyan);
+        }
+
+        .rule-item strong {
             display: block;
 
             color: var(--text-primary);
@@ -295,55 +403,26 @@
             margin-bottom: 0.5rem;
         }
 
+        .rule-item p {
+            font-size: 0.92rem;
+        }
+
 
         /* =====================================================
-           CODE BLOCK
+           CODE EXPRESSIONS
         ====================================================== */
 
-        .code-container {
-            margin-top: 1.5rem;
+        code {
+            display: inline-block;
+
+            padding: 0.1rem 0.4rem;
 
             background: #08090c;
 
             border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border-radius: 4px;
 
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            padding: 0.75rem 1rem;
-
-            background: var(--surface-light);
-
-            border-bottom: 1px solid var(--border);
-        }
-
-        .code-language {
             color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .code-label {
-            color: var(--text-muted);
-
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-        }
-
-        pre {
-            overflow-x: auto;
-
-            padding: 1.5rem;
-
-            color: #d4d4d8;
 
             font-family:
                 "SFMono-Regular",
@@ -351,71 +430,62 @@
                 "Liberation Mono",
                 monospace;
 
-            font-size: 0.82rem;
-            line-height: 1.7;
-        }
-
-        code {
-            font-family: inherit;
+            font-size: 0.85em;
         }
 
 
         /* =====================================================
-           ANALYTICS FLOW
+           CIRCUIT BREAKER STATES
         ====================================================== */
 
-        .analytics-flow {
+        .state-grid {
             display: grid;
 
             grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
+                repeat(auto-fit, minmax(260px, 1fr));
 
             gap: 1rem;
 
             margin-top: 1.5rem;
         }
 
-        .analytics-step {
+        .state-card {
             padding: 1.5rem;
 
             background: var(--surface-light);
 
             border: 1px solid var(--border);
             border-radius: var(--radius);
-
-            transition:
-                transform var(--transition),
-                border-color var(--transition);
         }
 
-        .analytics-step:hover {
-            transform: translateY(-3px);
-
-            border-color: var(--cyan);
+        .state-card.normal {
+            border-left: 3px solid var(--success);
         }
 
-        .analytics-step span {
+        .state-card.drift {
+            border-left: 3px solid var(--warning);
+        }
+
+        .state-label {
             display: block;
 
-            color: var(--success);
-
             font-family: monospace;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
 
             margin-bottom: 0.75rem;
         }
 
-        .analytics-step h3 {
-            font-size: 1rem;
+        .normal .state-label {
+            color: var(--success);
         }
 
-        .analytics-step p {
-            font-size: 0.88rem;
+        .drift .state-label {
+            color: var(--warning);
         }
 
 
         /* =====================================================
-           TECHNOLOGY TAGS
+           TECHNICAL STACK TAGS
         ====================================================== */
 
         .stack-tags {
@@ -471,14 +541,13 @@
                 padding-top: 2.5rem;
             }
 
-            .specification-card {
+            .stage-specification {
                 padding: 1.25rem;
             }
 
-            pre {
-                padding: 1rem;
-
-                font-size: 0.72rem;
+            .stage-header {
+                flex-direction: column;
+                gap: 1rem;
             }
 
         }
@@ -499,142 +568,156 @@
         <header class="document-header">
 
             <p class="eyebrow">
-                ENTERPRISE AUTOMATION // ANALYTICS ARCHITECTURE
+                ENTERPRISE SYSTEM ARCHITECTURE // INTEGRATION SPECIFICATION
             </p>
 
             <h1>
-                Automated Enterprise Snapshot Aggregator &amp; Analytics Framework
+                Enterprise Data Integration Pipeline &amp; Routing Architecture
             </h1>
 
             <p class="subtitle">
-                Technical Architecture Specification &amp;
-                Automated Spreadsheet Normalization Pipeline
+                Platform Coupling Overview &amp; Automated Transformation Engine
             </p>
 
-            <p class="overview">
-                This infrastructure specification outlines a
-                production-grade automated pipeline designed to ingest
-                daily operational snapshot reporting data, handle
-                multi-source data transformations, and generate
-                structured data models optimized for executive-ready
-                analytical dashboards.
-            </p>
+
+            <div class="metadata-grid">
+
+                <div class="metadata-item">
+
+                    <span class="metadata-label">
+                        STATUS
+                    </span>
+
+                    <span class="metadata-value status-operational">
+                        Operational / Highly Resilient Pipeline
+                    </span>
+
+                </div>
+
+
+                <div class="metadata-item">
+
+                    <span class="metadata-label">
+                        ARCHITECT
+                    </span>
+
+                    <span class="metadata-value">
+                        Angelique Greyling
+                    </span>
+
+                </div>
+
+
+                <div class="metadata-item">
+
+                    <span class="metadata-label">
+                        ENVIRONMENT
+                    </span>
+
+                    <span class="metadata-value">
+                        Cloud Staging &amp; Decoupled Data Operations Framework
+                    </span>
+
+                </div>
+
+            </div>
 
         </header>
 
 
         <!-- =====================================================
-             INBOUND ARCHITECTURE MAP
+             PIPELINE EXECUTION FLOW
         ====================================================== -->
 
         <section>
 
             <p class="section-label">
-                SYSTEM MAP // INBOUND ARCHITECTURE
+                PIPELINE ENGINE // EXECUTION FLOW
             </p>
 
             <h2>
-                Automated Data Processing Architecture
+                Four-Stage Automated Data Pipeline
             </h2>
 
 
-            <div class="architecture-map">
+            <div class="pipeline-flow">
 
 
-                <!-- DATA SOURCE -->
+                <!-- STAGE 01 -->
 
-                <article class="architecture-node">
+                <article class="pipeline-stage">
 
-                    <span class="node-number">
-                        LAYER 01
+                    <span class="stage-number">
+                        STAGE 01
                     </span>
 
                     <h3>
-                        Data Source
+                        Perimeter Isolation
                     </h3>
 
                     <p>
-                        Operational data captured through automated
-                        form endpoints.
+                        Inbound automated report drop-off through
+                        air-gapped cloud storage.
                     </p>
 
                 </article>
 
 
-                <!-- EXTRACTION -->
+                <!-- STAGE 02 -->
 
-                <article class="architecture-node">
+                <article class="pipeline-stage">
 
-                    <span class="node-number">
-                        LAYER 02
+                    <span class="stage-number">
+                        STAGE 02
                     </span>
 
                     <h3>
-                        Data Extraction Layer
+                        Process Extraction
                     </h3>
 
                     <p>
-                        Proxy scripts monitoring mailboxes and
-                        extracting report files.
+                        Scripting proxy engine executing header
+                        unmerging and row fill-down operations.
                     </p>
 
                 </article>
 
 
-                <!-- STORAGE -->
+                <!-- STAGE 03 -->
 
-                <article class="architecture-node">
+                <article class="pipeline-stage">
 
-                    <span class="node-number">
-                        LAYER 03
+                    <span class="stage-number">
+                        STAGE 03
                     </span>
 
                     <h3>
-                        Intermediate Storage
+                        Target Ingestion
                     </h3>
 
                     <p>
-                        Google Drive for raw snapshots and SharePoint
-                        for the processed ledger.
+                        Zero-touch relational database overwrite
+                        through the target database gate.
                     </p>
 
                 </article>
 
 
-                <!-- AUTOMATION -->
+                <!-- STAGE 04 -->
 
-                <article class="architecture-node">
+                <article class="pipeline-stage">
 
-                    <span class="node-number">
-                        LAYER 04
+                    <span class="stage-number">
+                        STAGE 04
                     </span>
 
                     <h3>
-                        Automation Processing
+                        Semantic Resiliency
                     </h3>
 
                     <p>
-                        Power Automate orchestration and TypeScript
-                        table formatting.
-                    </p>
-
-                </article>
-
-
-                <!-- ANALYTICS -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 05
-                    </span>
-
-                    <h3>
-                        Analytics Visualization
-                    </h3>
-
-                    <p>
-                        Power BI models and cloud scheduled refreshes.
+                        Power BI circuit-breaker mesh providing
+                        dynamic schema drift fault tolerance.
                     </p>
 
                 </article>
@@ -645,199 +728,342 @@
             <div class="stack-tags">
 
                 <span class="stack-tag">
-                    Automated Forms
+                    Cloud Storage
                 </span>
 
                 <span class="stack-tag">
-                    Google Apps Script
+                    TypeScript
                 </span>
 
                 <span class="stack-tag">
-                    Google Drive
-                </span>
-
-                <span class="stack-tag">
-                    Power Automate
-                </span>
-
-                <span class="stack-tag">
-                    Office Scripts
-                </span>
-
-                <span class="stack-tag">
-                    SharePoint
+                    PostgreSQL
                 </span>
 
                 <span class="stack-tag">
                     Power BI
                 </span>
 
+                <span class="stack-tag">
+                    DirectQuery
+                </span>
+
+                <span class="stack-tag">
+                    Power Query M
+                </span>
+
             </div>
 
         </section>
 
 
         <!-- =====================================================
-             SECTION 01
+             STAGE 01
         ====================================================== -->
 
-        <section class="specification-card">
+        <section class="stage-specification">
 
-            <div class="specification-header">
+            <div class="stage-header">
 
-                <span class="specification-number">
-                    SPECIFICATION 01 // EXTRACTION
+                <div>
+
+                    <span class="stage-tag">
+                        STAGE 01 // PERIMETER
+                    </span>
+
+                    <h2>
+                        Perimeter Isolation Barrier
+                    </h2>
+
+                </div>
+
+                <span class="stage-status">
+                    DECOUPLED
                 </span>
-
-                <h2>
-                    Automated Extraction &amp; Repository Management
-                </h2>
 
             </div>
 
 
-            <p>
-                The pipeline replaces manual extraction loops with an
-                automated scripting proxy. A dedicated script monitors
-                the inbound data inbox, captures incoming spreadsheet
-                attachments, commits the raw snapshot rows directly into
-                an archival folder structure, and clears the processed
-                message container to isolate the transaction and prevent
-                multi-pass file duplication.
-            </p>
+            <div class="technical-block">
 
+                <span class="block-label">
+                    01 // TECHNICAL IMPLEMENTATION
+                </span>
 
-            <div class="technical-callout">
-
-                <strong>
-                    Architectural Objective
-                </strong>
+                <h3>
+                    Cloud Blob Export
+                </h3>
 
                 <p>
-                    Raw snapshots are retained separately from downstream
-                    processed records, creating a clear boundary between
-                    source data preservation and analytical data
-                    transformation.
+                    Direct, synchronous upstream API integration hooks are
+                    permanently decommissioned. The ingestion sequence
+                    initializes through a decoupled scheduler within the
+                    mobile workforce platform. Every 24 hours, the system
+                    compiles transactional payloads, formats them into
+                    structural spreadsheet blobs, and routes them to an
+                    air-gapped cloud storage container through secure
+                    mail-attachment routing protocols.
                 </p>
 
             </div>
 
+
+            <div class="technical-block">
+
+                <span class="block-label">
+                    02 // RISK MITIGATION MATRIX
+                </span>
+
+
+                <ul class="rules-list">
+
+                    <li class="rule-item">
+
+                        <strong>
+                            Boundary Shielding
+                        </strong>
+
+                        <p>
+                            The localized core network is insulated from
+                            external API payload spikes and unscheduled
+                            structural modifications originating from
+                            third-party infrastructure.
+                        </p>
+
+                    </li>
+
+
+                    <li class="rule-item">
+
+                        <strong>
+                            State Serialization
+                        </strong>
+
+                        <p>
+                            Transient data streams are converted into
+                            physical, version-controlled spreadsheet fixtures
+                            at the perimeter, creating an immutable history
+                            trail for point-in-time recovery audits without
+                            downstream payload pollution.
+                        </p>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
         </section>
 
 
         <!-- =====================================================
-             SECTION 02
+             STAGE 02
         ====================================================== -->
 
-        <section class="specification-card">
+        <section class="stage-specification">
 
-            <div class="specification-header">
+            <div class="stage-header">
 
-                <span class="specification-number">
-                    SPECIFICATION 02 // NORMALIZATION
+                <div>
+
+                    <span class="stage-tag">
+                        STAGE 02 // TRANSFORMATION
+                    </span>
+
+                    <h2>
+                        Process Normalization Engine
+                    </h2>
+
+                </div>
+
+                <span class="stage-status">
+                    AUTOMATED
                 </span>
-
-                <h2>
-                    TypeScript Data Normalization Loop
-                </h2>
 
             </div>
 
 
-            <p>
-                Upon repository file drop detection, an automated
-                workflow calls a custom TypeScript Office Script to
-                standardize unstructured grid data into clean tables
-                before downstream analytics systems query the row models.
-            </p>
+            <div class="technical-block">
+
+                <span class="block-label">
+                    01 // AUTOMATED PROCESSING LOOP
+                </span>
+
+                <h3>
+                    TypeScript Scripting Proxy Engine
+                </h3>
+
+                <p>
+                    An automated cron-trigger activates an isolated
+                    TypeScript Scripting Proxy Engine container. The
+                    execution engine programmatically accesses the
+                    air-gapped staging layer, loads target binary blobs
+                    into volatile system memory arrays, and runs a
+                    multi-tier transformation script to resolve
+                    structural layout variations.
+                </p>
+
+            </div>
 
 
-            <!-- CODE BLOCK -->
+            <div class="technical-block">
 
-            <div class="code-container">
+                <span class="block-label">
+                    02 // ALGORITHMIC TRANSFORMATION RULES
+                </span>
 
-                <div class="code-header">
 
-                    <span class="code-language">
-                        TYPESCRIPT
+                <ul class="rules-list">
+
+                    <li class="rule-item">
+
+                        <strong>
+                            Header Structure Unmerging
+                        </strong>
+
+                        <p>
+                            The transformation script scans entry matrix
+                            coordinates, unmerges multi-column layout
+                            groupings, and maps distinct field indices
+                            into a normalized flat-file array.
+                        </p>
+
+                    </li>
+
+
+                    <li class="rule-item">
+
+                        <strong>
+                            Employee Identifier Key Binding
+                        </strong>
+
+                        <p>
+                            Missing parameters created by human interface
+                            limitations are caught through an algorithmic
+                            row-traversal loop. The engine executes a
+                            top-down forward-fill mechanism, tracks the
+                            active employee master token, and dynamically
+                            binds it across corresponding transactional
+                            timestamp sub-rows before database ingestion.
+                        </p>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             STAGE 03
+        ====================================================== -->
+
+        <section class="stage-specification">
+
+            <div class="stage-header">
+
+                <div>
+
+                    <span class="stage-tag">
+                        STAGE 03 // INGESTION
                     </span>
 
-                    <span class="code-label">
-                        OFFICE SCRIPT // NORMALIZATION ENGINE
+                    <h2>
+                        Target Ingestion Gate
+                    </h2>
+
+                </div>
+
+                <span class="stage-status">
+                    ZERO-TOUCH
+                </span>
+
+            </div>
+
+
+            <div class="technical-block">
+
+                <span class="block-label">
+                    01 // RELATIONAL INSERTION LOGIC
+                </span>
+
+                <h3>
+                    Atomic Database Overwrite
+                </h3>
+
+                <p>
+                    Clean, strongly-typed data payloads compiled during
+                    Stage 2 are piped directly into the localized
+                    PostgreSQL relational database layer. The staging
+                    engine triggers an atomic drop-and-rebuild script
+                    wrapper, overwriting targeted operational fact tables
+                    with zero manual interaction or data administration
+                    debt.
+                </p>
+
+
+                <div class="stack-tags">
+
+                    <span class="stack-tag">
+                        fact_time_logs
+                    </span>
+
+                    <span class="stack-tag">
+                        fact_asset_checklists
+                    </span>
+
+                    <span class="stack-tag">
+                        fact_quick_tasks
                     </span>
 
                 </div>
 
-
-                <pre><code>function main(workbook: ExcelScript.Workbook) {
-
-    // Access target data sheet layer
-    let targetSheet = workbook.getActiveWorksheet();
-    let usedRange = targetSheet.getUsedRange();
-
-    if (usedRange) {
-
-        let rowCount = usedRange.getRowCount();
-        let colCount = usedRange.getColumnCount();
-
-        // Unmerge nested layout block headers
-        // to clean the table space
-        usedRange.unmerge();
-
-        // Algorithmic column normalization
-        for (let col = 0; col &lt; colCount; col++) {
-
-            let firstHeaderValue =
-                targetSheet
-                    .getCell(0, col)
-                    .getValue() as string;
-
-            // Clean and normalize column header names
-            if (firstHeaderValue) {
-
-                let sanitizedHeader =
-                    firstHeaderValue
-                        .trim()
-                        .toLowerCase()
-                        .replace(/\s+/g, '_');
-
-                targetSheet
-                    .getCell(0, col)
-                    .setValue(sanitizedHeader);
-            }
-        }
-
-        // Force sanitized data into a
-        // structured Table Object mapping contract
-        let activeTable =
-            workbook.addTable(
-                usedRange.getAddress(),
-                true
-            );
-
-        activeTable.setName(
-            "Canonical_Operational_Ledger"
-        );
-    }
-}</code></pre>
-
             </div>
 
 
-            <div class="technical-callout">
+            <div class="technical-block">
 
-                <strong>
-                    Canonical Data Contract
-                </strong>
+                <span class="block-label">
+                    02 // REFERENTIAL INTEGRITY &amp; QUERY TUNING
+                </span>
 
-                <p>
-                    The normalization process converts a variable,
-                    presentation-oriented spreadsheet layout into the
-                    structured
-                    <code>Canonical_Operational_Ledger</code> table
-                    contract, providing a consistent boundary for
-                    downstream processing and analytics.
-                </p>
+
+                <ul class="rules-list">
+
+                    <li class="rule-item">
+
+                        <strong>
+                            Primary / Foreign Key Constraints
+                        </strong>
+
+                        <p>
+                            Incoming data streams are dynamically validated
+                            against the employee master directory table
+                            <code>dim_employees</code>. Out-of-bounds
+                            parameters or unknown personnel IDs trigger an
+                            intake verification alarm.
+                        </p>
+
+                    </li>
+
+
+                    <li class="rule-item">
+
+                        <strong>
+                            Index Preservation
+                        </strong>
+
+                        <p>
+                            Database indexes are structured using B-Tree
+                            parameters optimized for chronological
+                            boundaries and status strings, supporting fast
+                            analytical query resolution.
+                        </p>
+
+                    </li>
+
+                </ul>
 
             </div>
 
@@ -845,125 +1071,112 @@
 
 
         <!-- =====================================================
-             SECTION 03
+             STAGE 04
         ====================================================== -->
 
-        <section class="specification-card">
+        <section class="stage-specification">
 
-            <div class="specification-header">
+            <div class="stage-header">
 
-                <span class="specification-number">
-                    SPECIFICATION 03 // ANALYTICS
+                <div>
+
+                    <span class="stage-tag">
+                        STAGE 04 // SEMANTIC
+                    </span>
+
+                    <h2>
+                        Advanced Semantic Model Circuit Resiliency
+                    </h2>
+
+                </div>
+
+                <span class="stage-status">
+                    FAULT-TOLERANT
                 </span>
 
-                <h2>
-                    Power BI Analytical Modeling Layer
-                </h2>
-
             </div>
 
 
-            <p>
-                The structural table is published directly into a secure
-                corporate workspace where Power BI executes scheduled
-                refreshes against the processed records. Complex
-                spreadsheet modifications are handled upstream within the
-                automation layer, allowing the analytical model to remain
-                focused on semantic calculations and executive reporting.
-            </p>
+            <div class="technical-block">
 
+                <span class="block-label">
+                    01 // DYNAMIC BOUNDARY MAPPING
+                </span>
 
-            <div class="analytics-flow">
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 01
-                    </span>
-
-                    <h3>
-                        Structured Ledger
-                    </h3>
-
-                    <p>
-                        Normalized snapshot records are committed to the
-                        processed repository.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 02
-                    </span>
-
-                    <h3>
-                        Scheduled Refresh
-                    </h3>
-
-                    <p>
-                        Power BI retrieves structured records through
-                        automated workspace refresh processes.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 03
-                    </span>
-
-                    <h3>
-                        Semantic Modeling
-                    </h3>
-
-                    <p>
-                        The analytical model remains lightweight and
-                        focused on business logic and DAX calculations.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 04
-                    </span>
-
-                    <h3>
-                        Executive Analytics
-                    </h3>
-
-                    <p>
-                        Final dashboards deliver structured operational
-                        insights for management review.
-                    </p>
-
-                </article>
-
-            </div>
-
-
-            <div class="technical-callout">
-
-                <strong>
-                    Processing Boundary Principle
-                </strong>
+                <h3>
+                    DirectQuery Semantic Layer
+                </h3>
 
                 <p>
-                    Complex structural transformations are completed before
-                    data reaches the analytics layer. This separation keeps
-                    reporting models faster, reduces transformation
-                    overhead, and allows the semantic layer to concentrate
-                    on analytical calculations rather than source-file
-                    remediation.
+                    The analytics semantic layout connects directly to the
+                    PostgreSQL database through optimized DirectQuery
+                    connections. To insulate downstream reports from
+                    structural field drift caused by front-end form
+                    reconfigurations, the Power BI M-Query dataset
+                    operates through a robust, fault-tolerant schema layer.
                 </p>
+
+            </div>
+
+
+            <div class="technical-block">
+
+                <span class="block-label">
+                    02 // CIRCUIT-BREAKER ARCHITECTURE
+                </span>
+
+                <p>
+                    Instead of relying on fixed structural index numbers,
+                    column mappings are routed through a flexible,
+                    meta-driven schema lookup array. Using
+                    <code>Record.FieldOrDefault</code>, the semantic
+                    engine evaluates each dataset dynamically at query
+                    execution time.
+                </p>
+
+
+                <div class="state-grid">
+
+                    <article class="state-card normal">
+
+                        <span class="state-label">
+                            NORMAL STATE
+                        </span>
+
+                        <h3>
+                            Schema Alignment
+                        </h3>
+
+                        <p>
+                            When database fields align with model
+                            expectations, data passes directly through
+                            the semantic layer to visualization dashboards.
+                        </p>
+
+                    </article>
+
+
+                    <article class="state-card drift">
+
+                        <span class="state-label">
+                            DRIFT STATE
+                        </span>
+
+                        <h3>
+                            Fault Containment
+                        </h3>
+
+                        <p>
+                            If a column name is altered or missing, the
+                            query engine catches the modification, prevents
+                            a complete system failure, inserts a default
+                            placeholder parameter, and preserves report
+                            availability.
+                        </p>
+
+                    </article>
+
+                </div>
 
             </div>
 
@@ -976,9 +1189,9 @@
 
         <footer>
 
-            AUTOMATED ENTERPRISE SNAPSHOT AGGREGATOR
+            ENTERPRISE DATA INTEGRATION PIPELINE
             &nbsp; // &nbsp;
-            ANALYTICS FRAMEWORK SPECIFICATION
+            ROUTING ARCHITECTURE SPECIFICATION
             &nbsp; // &nbsp;
             ANGELIQUE GREYLING
 
