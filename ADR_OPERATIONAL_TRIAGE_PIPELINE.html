@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADR: Integration Coupling &amp; Triage | Angelique Greyling</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <header class="site-header">
+        <div class="header-content">
+            <div class="title-block">
+                <p class="eyebrow">SYSTEM LOG // SYSTEM 01</p>
+                <h1>Architecture Decision Record: Integration Coupling &amp; Triage</h1>
+                <p class="professional-title">Logistics Management &amp; Industrial Field Operations Platform</p>
+                <div class="contact-details">
+                    <span><strong>Architect:</strong> Angelique Greyling (Principal Solutions Engineer)</span>
+                    <span class="separator">|</span>
+                    <span><strong>Scoping Context:</strong> Scaled Ingestion Blueprint for 120+ Field Technicians</span>
+                </div>
+            </div>
+            <div class="system-clock">
+                <span class="clock-label">STATUS</span>
+                <span class="status-badge" style="background: rgba(34, 211, 238, 0.1); border-color: var(--cyan); color: var(--cyan);">APPROVED / DEFENSIVE</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+    <main>
+        <!-- SYSTEM CONTEXT & PIPELINE TOPOLOGY -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">01 // TOPOLOGY MAP</p>
+                <h2>System Context &amp; Pipeline Topology</h2>
+            </div>
+            <div style="background: var(--card-background); border: 1px solid var(--border); padding: 2rem; border-radius: var(--card-radius); font-family: monospace; white-space: pre; overflow-x: auto; color: var(--cyan); line-height: 1.4; font-size: 0.9rem;">
+ [FIELD REPORTING APP] ──► (Fragile Schema Payloads)
+         │
+         ▼
+ [DECOMMISSIONED APIS] ──(Inbound Boundary Failure / Risk of Corruption)──► [PROD DB]
+         │
+         ▼ (Architectural Pivot)
+ [ASYNC STAGING CONTAINER] ──► [SCRIPTING PROXY ENGINE] ──► [SHAREPOINT] ──► [POWER BI]
+                               • Row Unmerging            • Daily Overwrite • Resilient Schema
+                               • Column Fill-Down Logic   • Zero Debt       • Temporal Lookups</div>
+        </section>
+
+        <!-- ADR-001 -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">02 // ARCHITECTURE DESIGN DECISION</p>
+                <h2>ADR-001: Decommissioning Direct Real-Time API Connections</h2>
+            </div>
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Context &amp; Structural Friction</h4>
+                    <p>The upstream operational platform was designated as the primary data ingestion field boundary for on-site checklist submissions. However, architectural discovery revealed that the platform completely lacked data deletion flags within its tracking frameworks. If an operator submitted an entry, modified a checkbox, or cleared an incomplete record, the endpoints passed real-time delta streams without structural state reconciliation.</p>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Evaluated Alternatives</h4>
+                    <p style="margin-bottom: 0.75rem;"><strong>Option A: Real-Time Endpoint Direct Mapping.</strong> Bind the live delta tracking stream to an event-driven database receiver. (Rejected due to extreme duplication and record fragmentation risks).</p>
+                    <p><strong>Option B: Custom Server-Side Middleware API.</strong> Deploy a localized Node.js/Python microservice to verify state logic. (Rejected due to disproportionate licensing, setup, and compute execution costs for a regional operational scale under 150 active users).</p>
+                </div>
+
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Architectural Justification &amp; Trade-Off Mitigation</h4>
+                    <p>Direct real-time stream links were explicitly rejected. Without native data deletion flags, an append-only transaction framework poses a critical risk of data duplication and downstream semantic model contamination at the database perimeter. The architecture was decoupled by implementing an asynchronous, file-mediated staging barrier. Raw data packages are routed as automated daily report sheets into an isolated staging mailbox, protecting the core database boundary from upstream mutation noise.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-002 -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">03 // DATA INTAKE ENGINEERING</p>
+                <h2>ADR-002: Decommissioning Frail Low-Code Workflow System Intake</h2>
+            </div>
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Context &amp; Structural Friction</h4>
+                    <p>Initial system proposals suggested utilizing basic cloud-native automation flows to sweep incoming attachments and map parameters straight to a corporate relational database schema. However, the mobile form variations nested conditional arrays (e.g., binary validation flags versus custom asset data fields) on entirely mismatched data property tiers.</p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Evaluated Alternatives</h4>
+                    <p><strong>Option A: Nested Low-Code Conditional Loops.</strong> Build extensive looping conditional branches within standard cloud flows to dynamically parse fluctuating multi-tier property trees. (Rejected: Extreme execution latency, brittle error-handling bounds, and a high probability of total pipeline failure during minor front-end form adaptations).</p>
+                </div>
+                
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Architectural Justification &amp; Trade-Off Mitigation</h4>
+                    <p>Frail, low-code integration loops were decommissioned for raw data parsing and flattening tasks. Instead, data transformation duties were shifted to an air-gapped <strong>Scripting Proxy Engine</strong> utilizing robust procedural code execution environments (TypeScript). The script containers programmatically open the spreadsheet blobs, unmerge nested layout headers, execute algorithmic column fill-down loops to safely bind employee identification keys, and output a clean, flat, strongly-typed data contract, reducing tracking workflow processing debt by over 70%.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-003 -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">04 // SEMANTIC GOVERNANCE</p>
+                <h2>ADR-003: Production Semantic Governance &amp; Dynamic Schema Maps</h2>
+            </div>
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Context &amp; Structural Friction</h4>
+                    <p>Non-technical corporate field coordinators routinely modify front-end question formatting without notice, changing database tables and causing query models to crash inside standard business intelligence solutions.</p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Architectural Resolution</h4>
+                    <p>Implemented an automated <strong>Structural Circuit Breaker</strong> inside the advanced semantic query editor workspace. Instead of referencing incoming columns via rigid index arrays, the data model maps fields via a dynamic <code>SchemaMap</code> array driven by <code>Record.FieldOrDefault</code> functional logic.</p>
+                </div>
+
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Consequence Assessment</h4>
+                    <p>If a column header shifts or is renamed unexpectedly by field operators, the semantic model automatically catches the anomaly, intercepts the data type, and defaults the parameter value rather than triggering a hard database crash. This defensive strategy ensures unbroken analytical dashboard uptime for executive decision-makers.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================== -->
+    <footer class="site-footer">
+        <p>ANGELIQUE GREYLING | SOLUTIONS PORTFOLIO SYSTEM LOGS</p>
+    </footer>
+</body>
+</html>
