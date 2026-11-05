@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Multi-Channel Enterprise Client Onboarding Ingestion Pipeline
-    </title>
+    <title>Automated Enterprise Snapshot Aggregator & Analytics Framework</title>
 
     <style>
 
@@ -27,15 +25,15 @@
             --text-secondary: #a1a1aa;
             --text-muted: #71717a;
 
-            --danger: #f87171;
             --success: #22c55e;
 
             --radius: 10px;
+            --transition: 0.25s ease;
         }
 
 
         /* =====================================================
-           GLOBAL
+           GLOBAL RESET
         ====================================================== */
 
         * {
@@ -87,7 +85,7 @@
 
 
         /* =====================================================
-           HEADER
+           DOCUMENT HEADER
         ====================================================== */
 
         .document-header {
@@ -109,7 +107,7 @@
         }
 
         h1 {
-            max-width: 900px;
+            max-width: 1000px;
 
             font-size: clamp(2rem, 5vw, 3.5rem);
             line-height: 1.1;
@@ -125,12 +123,12 @@
             font-weight: 600;
             letter-spacing: 0.04em;
             text-transform: uppercase;
+
+            margin-bottom: 1.75rem;
         }
 
         .overview {
             max-width: 900px;
-
-            margin-top: 2rem;
 
             color: var(--text-secondary);
 
@@ -139,7 +137,7 @@
 
 
         /* =====================================================
-           SECTION STRUCTURE
+           GENERAL SECTION STYLING
         ====================================================== */
 
         section {
@@ -174,30 +172,24 @@
 
 
         /* =====================================================
-           INGESTION FLOW DIAGRAM
+           INBOUND ARCHITECTURE MAP
         ====================================================== */
 
-        .flow-diagram {
+        .architecture-map {
             display: grid;
 
             grid-template-columns:
-                repeat(auto-fit, minmax(180px, 1fr));
+                repeat(auto-fit, minmax(210px, 1fr));
 
             gap: 1rem;
-
-            align-items: stretch;
         }
 
-        .flow-node {
+        .architecture-node {
             position: relative;
 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            min-height: 180px;
 
-            min-height: 150px;
-
-            padding: 1.25rem;
+            padding: 1.5rem;
 
             background: var(--surface);
 
@@ -205,59 +197,45 @@
             border-radius: var(--radius);
 
             transition:
-                transform 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
+                transform var(--transition),
+                border-color var(--transition),
+                box-shadow var(--transition);
         }
 
-        .flow-node:hover {
+        .architecture-node:hover {
             transform: translateY(-4px);
 
             border-color: var(--cyan);
 
             box-shadow:
-                0 0 20px rgba(34, 211, 238, 0.08);
+                0 0 25px rgba(34, 211, 238, 0.08);
         }
 
         .node-number {
             display: block;
 
-            color: var(--text-muted);
+            color: var(--violet);
 
             font-family: monospace;
             font-size: 0.75rem;
 
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .flow-node h3 {
-            margin-bottom: 0;
+        .architecture-node h3 {
+            color: var(--text-primary);
 
-            font-size: 0.95rem;
+            font-size: 1rem;
             line-height: 1.4;
         }
 
-
-        /* Fault node receives a distinct visual state */
-
-        .fault-node {
-            border-color: rgba(248, 113, 113, 0.35);
-        }
-
-        .fault-node:hover {
-            border-color: var(--danger);
-
-            box-shadow:
-                0 0 20px rgba(248, 113, 113, 0.08);
-        }
-
-        .fault-node .node-number {
-            color: var(--danger);
+        .architecture-node p {
+            font-size: 0.88rem;
         }
 
 
         /* =====================================================
-           TECHNICAL SPECIFICATION BLOCKS
+           SPECIFICATION CARDS
         ====================================================== */
 
         .specification-card {
@@ -268,46 +246,48 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
 
+            margin-bottom: 2rem;
+        }
+
+        .specification-header {
+            padding-bottom: 1.5rem;
+
+            border-bottom: 1px solid var(--border);
+
             margin-bottom: 1.5rem;
         }
 
         .specification-number {
-            display: inline-block;
+            display: block;
 
-            color: var(--violet);
+            color: var(--cyan);
 
             font-family: monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
 
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
-        .specification-card > h2 {
-            margin-bottom: 1.5rem;
+        .specification-header h2 {
+            margin-bottom: 0;
         }
 
 
         /* =====================================================
-           DATA CONTRACT LIST
+           TECHNICAL CALLOUTS
         ====================================================== */
 
-        .contract-list {
-            display: grid;
+        .technical-callout {
+            margin-top: 1.5rem;
 
-            gap: 1rem;
-
-            list-style: none;
-        }
-
-        .contract-item {
             padding: 1.25rem;
 
-            background: rgba(255, 255, 255, 0.015);
+            background: var(--surface-light);
 
-            border-left: 2px solid var(--cyan);
+            border-left: 3px solid var(--violet);
         }
 
-        .contract-item strong {
+        .technical-callout strong {
             display: block;
 
             color: var(--text-primary);
@@ -315,26 +295,55 @@
             margin-bottom: 0.5rem;
         }
 
-        .contract-item p {
-            font-size: 0.92rem;
-        }
-
 
         /* =====================================================
-           CODE / TECHNICAL EXPRESSIONS
+           CODE BLOCK
         ====================================================== */
 
-        code {
-            display: inline-block;
-
-            padding: 0.1rem 0.4rem;
+        .code-container {
+            margin-top: 1.5rem;
 
             background: #08090c;
 
             border: 1px solid var(--border);
-            border-radius: 4px;
+            border-radius: var(--radius);
 
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0.75rem 1rem;
+
+            background: var(--surface-light);
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-language {
             color: var(--cyan);
+
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .code-label {
+            color: var(--text-muted);
+
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+        }
+
+        pre {
+            overflow-x: auto;
+
+            padding: 1.5rem;
+
+            color: #d4d4d8;
 
             font-family:
                 "SFMono-Regular",
@@ -342,15 +351,20 @@
                 "Liberation Mono",
                 monospace;
 
-            font-size: 0.85em;
+            font-size: 0.82rem;
+            line-height: 1.7;
+        }
+
+        code {
+            font-family: inherit;
         }
 
 
         /* =====================================================
-           IDEMPOTENCY FLOW
+           ANALYTICS FLOW
         ====================================================== */
 
-        .process-grid {
+        .analytics-flow {
             display: grid;
 
             grid-template-columns:
@@ -361,64 +375,69 @@
             margin-top: 1.5rem;
         }
 
-        .process-step {
-            padding: 1.25rem;
+        .analytics-step {
+            padding: 1.5rem;
 
             background: var(--surface-light);
 
             border: 1px solid var(--border);
             border-radius: var(--radius);
+
+            transition:
+                transform var(--transition),
+                border-color var(--transition);
         }
 
-        .process-step span {
+        .analytics-step:hover {
+            transform: translateY(-3px);
+
+            border-color: var(--cyan);
+        }
+
+        .analytics-step span {
             display: block;
 
-            color: var(--cyan);
+            color: var(--success);
 
             font-family: monospace;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
 
             margin-bottom: 0.75rem;
         }
 
-        .process-step h3 {
-            font-size: 0.95rem;
+        .analytics-step h3 {
+            font-size: 1rem;
+        }
+
+        .analytics-step p {
+            font-size: 0.88rem;
         }
 
 
         /* =====================================================
-           FAULT CONTAINMENT
+           TECHNOLOGY TAGS
         ====================================================== */
 
-        .fault-container {
-            border-left: 3px solid var(--danger);
+        .stack-tags {
+            display: flex;
+            flex-wrap: wrap;
 
-            padding: 1.5rem;
+            gap: 0.6rem;
 
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(248, 113, 113, 0.05),
-                    transparent
-                );
+            margin-top: 1.5rem;
         }
 
-        .fault-status {
-            display: inline-block;
+        .stack-tag {
+            padding: 0.35rem 0.7rem;
 
-            margin-bottom: 1rem;
+            background: rgba(34, 211, 238, 0.05);
 
-            padding: 0.3rem 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 999px;
 
-            background: rgba(248, 113, 113, 0.1);
+            color: var(--text-secondary);
 
-            border: 1px solid rgba(248, 113, 113, 0.4);
-            border-radius: 4px;
-
-            color: var(--danger);
-
-            font-family: monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
 
@@ -433,17 +452,18 @@
 
             color: var(--text-muted);
 
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             letter-spacing: 0.08em;
+
             text-align: center;
         }
 
 
         /* =====================================================
-           RESPONSIVE
+           RESPONSIVE DESIGN
         ====================================================== */
 
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
 
             .container {
                 width: min(100% - 2rem, 1200px);
@@ -453,6 +473,12 @@
 
             .specification-card {
                 padding: 1.25rem;
+            }
+
+            pre {
+                padding: 1rem;
+
+                font-size: 0.72rem;
             }
 
         }
@@ -473,128 +499,178 @@
         <header class="document-header">
 
             <p class="eyebrow">
-                PRODUCTION SYSTEM ARCHITECTURE // INTEGRATION SPECIFICATION
+                ENTERPRISE AUTOMATION // ANALYTICS ARCHITECTURE
             </p>
 
             <h1>
-                Multi-Channel Enterprise Client Onboarding Ingestion Pipeline
+                Automated Enterprise Snapshot Aggregator &amp; Analytics Framework
             </h1>
 
             <p class="subtitle">
-                Operational Integration Specification &amp; Core Data Contracts
+                Technical Architecture Specification &amp;
+                Automated Spreadsheet Normalization Pipeline
             </p>
 
             <p class="overview">
-                This production system architecture blueprint establishes a
-                fully decoupled, fault-tolerant onboarding perimeter. The
-                pipeline ingests multi-channel account registration telemetry,
-                normalizes incoming field variations at the border, prevents
-                customer record duplication, executes conditional tier
-                allocation routing, and delivers executive digests across
-                centralized communication matrices.
+                This infrastructure specification outlines a
+                production-grade automated pipeline designed to ingest
+                daily operational snapshot reporting data, handle
+                multi-source data transformations, and generate
+                structured data models optimized for executive-ready
+                analytical dashboards.
             </p>
 
         </header>
 
 
         <!-- =====================================================
-             INGESTION FLOW
+             INBOUND ARCHITECTURE MAP
         ====================================================== -->
 
         <section>
 
             <p class="section-label">
-                SYSTEM FLOW // INGESTION PIPELINE
+                SYSTEM MAP // INBOUND ARCHITECTURE
             </p>
 
-            <h2>Ingestion Flow Diagram</h2>
+            <h2>
+                Automated Data Processing Architecture
+            </h2>
 
-            <div class="flow-diagram">
 
-                <article class="flow-node">
+            <div class="architecture-map">
+
+
+                <!-- DATA SOURCE -->
+
+                <article class="architecture-node">
 
                     <span class="node-number">
-                        NODE 01
+                        LAYER 01
                     </span>
 
                     <h3>
-                        Inbound Ingestion Webhook / Staging Gateway
-                    </h3>
-
-                </article>
-
-
-                <article class="flow-node">
-
-                    <span class="node-number">
-                        NODE 02
-                    </span>
-
-                    <h3>
-                        Data Sanitization Engine
+                        Data Source
                     </h3>
 
                     <p>
-                        Passes Data Validation
+                        Operational data captured through automated
+                        form endpoints.
                     </p>
 
                 </article>
 
 
-                <article class="flow-node fault-node">
+                <!-- EXTRACTION -->
+
+                <article class="architecture-node">
 
                     <span class="node-number">
-                        FAULT LANE
+                        LAYER 02
                     </span>
 
                     <h3>
-                        Perimeter Fault Tab
+                        Data Extraction Layer
                     </h3>
 
                     <p>
-                        Malformed Payload Drop
+                        Proxy scripts monitoring mailboxes and
+                        extracting report files.
                     </p>
 
                 </article>
 
 
-                <article class="flow-node">
+                <!-- STORAGE -->
+
+                <article class="architecture-node">
 
                     <span class="node-number">
-                        NODE 03
+                        LAYER 03
                     </span>
 
                     <h3>
-                        Deduplication Lookup Key Search
+                        Intermediate Storage
                     </h3>
+
+                    <p>
+                        Google Drive for raw snapshots and SharePoint
+                        for the processed ledger.
+                    </p>
 
                 </article>
 
 
-                <article class="flow-node">
+                <!-- AUTOMATION -->
+
+                <article class="architecture-node">
 
                     <span class="node-number">
-                        NODE 04
+                        LAYER 04
                     </span>
 
                     <h3>
-                        Territory Allocation Matrix
+                        Automation Processing
                     </h3>
+
+                    <p>
+                        Power Automate orchestration and TypeScript
+                        table formatting.
+                    </p>
 
                 </article>
 
 
-                <article class="flow-node">
+                <!-- ANALYTICS -->
+
+                <article class="architecture-node">
 
                     <span class="node-number">
-                        NODE 05
+                        LAYER 05
                     </span>
 
                     <h3>
-                        Terminal Lifecycle Ledger Commit
+                        Analytics Visualization
                     </h3>
 
+                    <p>
+                        Power BI models and cloud scheduled refreshes.
+                    </p>
+
                 </article>
+
+            </div>
+
+
+            <div class="stack-tags">
+
+                <span class="stack-tag">
+                    Automated Forms
+                </span>
+
+                <span class="stack-tag">
+                    Google Apps Script
+                </span>
+
+                <span class="stack-tag">
+                    Google Drive
+                </span>
+
+                <span class="stack-tag">
+                    Power Automate
+                </span>
+
+                <span class="stack-tag">
+                    Office Scripts
+                </span>
+
+                <span class="stack-tag">
+                    SharePoint
+                </span>
+
+                <span class="stack-tag">
+                    Power BI
+                </span>
 
             </div>
 
@@ -602,168 +678,271 @@
 
 
         <!-- =====================================================
-             INGESTION HYGIENE
+             SECTION 01
         ====================================================== -->
 
         <section class="specification-card">
 
-            <span class="specification-number">
-                SPECIFICATION 01
-            </span>
+            <div class="specification-header">
 
-            <h2>
-                Ingestion Hygiene &amp; Normalization Formations
-            </h2>
+                <span class="specification-number">
+                    SPECIFICATION 01 // EXTRACTION
+                </span>
 
+                <h2>
+                    Automated Extraction &amp; Repository Management
+                </h2>
 
-            <ul class="contract-list">
-
-                <li class="contract-item">
-
-                    <strong>
-                        Canonical Email Isolation Key
-                    </strong>
-
-                    <p>
-                        Forces all incoming subscriber strings to lowercase
-                        and runs a global trim operation
-                        <code>lower(trim(email))</code>. This collapses
-                        casing and whitespace variants before exact-match
-                        lookup loops execute.
-                    </p>
-
-                </li>
+            </div>
 
 
-                <li class="contract-item">
-
-                    <strong>
-                        E.164 Phone Normalization
-                    </strong>
-
-                    <p>
-                        Strips formatting punctuation characters
-                        <code>( ) - .</code> upstream and enforces a
-                        text-string layout starting with a leading plus
-                        sign constraint, preventing spreadsheet engines
-                        from applying automatic numeric coercion.
-                    </p>
-
-                </li>
+            <p>
+                The pipeline replaces manual extraction loops with an
+                automated scripting proxy. A dedicated script monitors
+                the inbound data inbox, captures incoming spreadsheet
+                attachments, commits the raw snapshot rows directly into
+                an archival folder structure, and clears the processed
+                message container to isolate the transaction and prevent
+                multi-pass file duplication.
+            </p>
 
 
-                <li class="contract-item">
+            <div class="technical-callout">
 
-                    <strong>
-                        Currency Parameter Partitioning
-                    </strong>
+                <strong>
+                    Architectural Objective
+                </strong>
 
-                    <p>
-                        Converts raw currency strings containing symbols
-                        such as <code>$</code> and <code>,</code> into
-                        pure numeric decimals before loop summary
-                        aggregation occurs, separating mathematical
-                        processing from view formatting rules.
-                    </p>
+                <p>
+                    Raw snapshots are retained separately from downstream
+                    processed records, creating a clear boundary between
+                    source data preservation and analytical data
+                    transformation.
+                </p>
 
-                </li>
-
-            </ul>
+            </div>
 
         </section>
 
 
         <!-- =====================================================
-             IDEMPOTENCY
+             SECTION 02
         ====================================================== -->
 
         <section class="specification-card">
 
-            <span class="specification-number">
-                SPECIFICATION 02
-            </span>
+            <div class="specification-header">
 
-            <h2>
-                Multi-Pass Idempotency &amp; Lifecycle Protections
-            </h2>
+                <span class="specification-number">
+                    SPECIFICATION 02 // NORMALIZATION
+                </span>
+
+                <h2>
+                    TypeScript Data Normalization Loop
+                </h2>
+
+            </div>
+
 
             <p>
-                Before executing database modifications, the pipeline
-                executes a historical search bounded by a strict
-                <code>Limit = 1</code> condition using the sanitized
-                email lookup key.
+                Upon repository file drop detection, an automated
+                workflow calls a custom TypeScript Office Script to
+                standardize unstructured grid data into clean tables
+                before downstream analytics systems query the row models.
             </p>
 
 
-            <div class="process-grid">
+            <!-- CODE BLOCK -->
 
-                <article class="process-step">
+            <div class="code-container">
+
+                <div class="code-header">
+
+                    <span class="code-language">
+                        TYPESCRIPT
+                    </span>
+
+                    <span class="code-label">
+                        OFFICE SCRIPT // NORMALIZATION ENGINE
+                    </span>
+
+                </div>
+
+
+                <pre><code>function main(workbook: ExcelScript.Workbook) {
+
+    // Access target data sheet layer
+    let targetSheet = workbook.getActiveWorksheet();
+    let usedRange = targetSheet.getUsedRange();
+
+    if (usedRange) {
+
+        let rowCount = usedRange.getRowCount();
+        let colCount = usedRange.getColumnCount();
+
+        // Unmerge nested layout block headers
+        // to clean the table space
+        usedRange.unmerge();
+
+        // Algorithmic column normalization
+        for (let col = 0; col &lt; colCount; col++) {
+
+            let firstHeaderValue =
+                targetSheet
+                    .getCell(0, col)
+                    .getValue() as string;
+
+            // Clean and normalize column header names
+            if (firstHeaderValue) {
+
+                let sanitizedHeader =
+                    firstHeaderValue
+                        .trim()
+                        .toLowerCase()
+                        .replace(/\s+/g, '_');
+
+                targetSheet
+                    .getCell(0, col)
+                    .setValue(sanitizedHeader);
+            }
+        }
+
+        // Force sanitized data into a
+        // structured Table Object mapping contract
+        let activeTable =
+            workbook.addTable(
+                usedRange.getAddress(),
+                true
+            );
+
+        activeTable.setName(
+            "Canonical_Operational_Ledger"
+        );
+    }
+}</code></pre>
+
+            </div>
+
+
+            <div class="technical-callout">
+
+                <strong>
+                    Canonical Data Contract
+                </strong>
+
+                <p>
+                    The normalization process converts a variable,
+                    presentation-oriented spreadsheet layout into the
+                    structured
+                    <code>Canonical_Operational_Ledger</code> table
+                    contract, providing a consistent boundary for
+                    downstream processing and analytics.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SECTION 03
+        ====================================================== -->
+
+        <section class="specification-card">
+
+            <div class="specification-header">
+
+                <span class="specification-number">
+                    SPECIFICATION 03 // ANALYTICS
+                </span>
+
+                <h2>
+                    Power BI Analytical Modeling Layer
+                </h2>
+
+            </div>
+
+
+            <p>
+                The structural table is published directly into a secure
+                corporate workspace where Power BI executes scheduled
+                refreshes against the processed records. Complex
+                spreadsheet modifications are handled upstream within the
+                automation layer, allowing the analytical model to remain
+                focused on semantic calculations and executive reporting.
+            </p>
+
+
+            <div class="analytics-flow">
+
+
+                <article class="analytics-step">
 
                     <span>
                         STEP 01
                     </span>
 
                     <h3>
-                        Sanitize Lookup Key
+                        Structured Ledger
                     </h3>
 
                     <p>
-                        Normalize the incoming email before database
-                        comparison.
+                        Normalized snapshot records are committed to the
+                        processed repository.
                     </p>
 
                 </article>
 
 
-                <article class="process-step">
+                <article class="analytics-step">
 
                     <span>
                         STEP 02
                     </span>
 
                     <h3>
-                        Historical Lookup
+                        Scheduled Refresh
                     </h3>
 
                     <p>
-                        Execute an exact-match search with
-                        <code>Limit = 1</code>.
+                        Power BI retrieves structured records through
+                        automated workspace refresh processes.
                     </p>
 
                 </article>
 
 
-                <article class="process-step">
+                <article class="analytics-step">
 
                     <span>
                         STEP 03
                     </span>
 
                     <h3>
-                        Branch Decision
+                        Semantic Modeling
                     </h3>
 
                     <p>
-                        Determine whether the record is new or represents
-                        a retry execution.
+                        The analytical model remains lightweight and
+                        focused on business logic and DAX calculations.
                     </p>
 
                 </article>
 
 
-                <article class="process-step">
+                <article class="analytics-step">
 
                     <span>
                         STEP 04
                     </span>
 
                     <h3>
-                        Protected Update
+                        Executive Analytics
                     </h3>
 
                     <p>
-                        Modify mutable fields only and suppress duplicate
-                        lifecycle communications.
+                        Final dashboards deliver structured operational
+                        insights for management review.
                     </p>
 
                 </article>
@@ -771,53 +950,19 @@
             </div>
 
 
-            <p style="margin-top: 1.5rem;">
-                If a record already exists, the workflow branches to an
-                update path. It modifies only mutable fields, such as
-                contract value metrics, and appends a timestamped note
-                tracking the retry execution. Welcome messages and
-                representative alerts are completely suppressed.
-            </p>
+            <div class="technical-callout">
 
-        </section>
-
-
-        <!-- =====================================================
-             FAULT CONTAINMENT
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <span class="specification-number">
-                SPECIFICATION 03
-            </span>
-
-            <h2>
-                Localized Fault Containment
-            </h2>
-
-
-            <div class="fault-container">
-
-                <span class="fault-status">
-                    400_BAD_REQUEST
-                </span>
+                <strong>
+                    Processing Boundary Principle
+                </strong>
 
                 <p>
-                    To prevent silent scenario loop failure, dedicated error
-                    handlers are appended to outbound message boundaries.
-                    If a communication endpoint times out or drops
-                    connectivity, the local error lane intercepts the
-                    exception and records a forensic status into an internal
-                    errors tracking tab.
-                </p>
-
-                <p style="margin-top: 1rem;">
-                    The system then routes an incident alert to the system
-                    manager. The fault lane terminates through a native
-                    <code>Resume</code> directive with a safe fallback
-                    token, allowing the primary execution pipeline to
-                    continue running without unnecessary interruption.
+                    Complex structural transformations are completed before
+                    data reaches the analytics layer. This separation keeps
+                    reporting models faster, reduces transformation
+                    overhead, and allows the semantic layer to concentrate
+                    on analytical calculations rather than source-file
+                    remediation.
                 </p>
 
             </div>
@@ -831,9 +976,11 @@
 
         <footer>
 
-            MULTI-CHANNEL ENTERPRISE CLIENT ONBOARDING PIPELINE
+            AUTOMATED ENTERPRISE SNAPSHOT AGGREGATOR
             &nbsp; // &nbsp;
-            OPERATIONAL INTEGRATION SPECIFICATION
+            ANALYTICS FRAMEWORK SPECIFICATION
+            &nbsp; // &nbsp;
+            ANGELIQUE GREYLING
 
         </footer>
 
@@ -841,7 +988,3 @@
 
 </body>
 </html>
-
-A small structural note: I treated the Perimeter Fault Tab as a visually distinct fault lane rather than making it appear as though every record flows through it. That better communicates the architecture to a technical reviewer: the normal pipeline continues through validation and deduplication, while malformed payloads are diverted into an exception path.
-Also, this page is intentionally self-contained with its CSS embedded. That makes it useful as an individual technical system document in your repository. If you want all of your architecture pages to share the same global portfolio styling, you could instead move the CSS into your existing styles.css and link to it from each page.
-
