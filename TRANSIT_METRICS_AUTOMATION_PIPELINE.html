@@ -1,1369 +1,978 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Automated Enterprise Snapshot Aggregator & Analytics Framework</title>
-
-    <style>
-
-        /* =====================================================
-           DESIGN VARIABLES
-        ====================================================== */
-
-        :root {
-            --background: #09090b;
-            --surface: #101217;
-            --surface-light: #161922;
-            --border: #272a32;
-
-            --cyan: #22d3ee;
-            --violet: #7658A6;
-
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-
-            --danger: #f87171;
-            --success: #22c55e;
-
-            --radius: 10px;
-        }
-
-
-        /* =====================================================
-           GLOBAL
-        ====================================================== */
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            min-height: 100vh;
-
-            background:
-                radial-gradient(
-                    circle at top right,
-                    rgba(34, 211, 238, 0.04),
-                    transparent 30%
-                ),
-                var(--background);
-
-            color: var(--text-primary);
-
-            font-family:
-                Inter,
-                ui-sans-serif,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
-            line-height: 1.7;
-        }
-
-
-        /* =====================================================
-           PAGE CONTAINER
-        ====================================================== */
-
-        .container {
-            width: min(1200px, calc(100% - 2.5rem));
-            margin: 0 auto;
-
-            padding: 4rem 0 6rem;
-        }
-
-
-        /* =====================================================
-           HEADER
-        ====================================================== */
-
-        .document-header {
-            padding-bottom: 2.5rem;
-
-            border-bottom: 1px solid var(--border);
-
-            margin-bottom: 4rem;
-        }
-
-        .eyebrow {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            max-width: 900px;
-
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-
-            margin-bottom: 1rem;
-        }
-
-        .subtitle {
-            color: var(--violet);
-
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        .overview {
-            max-width: 900px;
-
-            margin-top: 2rem;
-
-            color: var(--text-secondary);
-
-            font-size: 1.05rem;
-        }
-
-
-        /* =====================================================
-           SECTION STRUCTURE
-        ====================================================== */
-
-        section {
-            margin-bottom: 4rem;
-        }
-
-        .section-label {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 0.75rem;
-        }
-
-        h2 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-
-            margin-bottom: 1.5rem;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-
-            margin-bottom: 1rem;
-        }
-
-        p {
-            color: var(--text-secondary);
-        }
-
-
-        /* =====================================================
-           INGESTION FLOW DIAGRAM
-        ====================================================== */
-
-        .flow-diagram {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(180px, 1fr));
-
-            gap: 1rem;
-
-            align-items: stretch;
-        }
-
-        .flow-node {
-            position: relative;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            min-height: 150px;
-
-            padding: 1.25rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            transition:
-                transform 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-        .flow-node:hover {
-            transform: translateY(-4px);
-
-            border-color: var(--cyan);
-
-            box-shadow:
-                0 0 20px rgba(34, 211, 238, 0.08);
-        }
-
-        .node-number {
-            display: block;
-
-            color: var(--text-muted);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .flow-node h3 {
-            margin-bottom: 0;
-
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-
-        /* Fault node receives a distinct visual state */
-
-        .fault-node {
-            border-color: rgba(248, 113, 113, 0.35);
-        }
-
-        .fault-node:hover {
-            border-color: var(--danger);
-
-            box-shadow:
-                0 0 20px rgba(248, 113, 113, 0.08);
-        }
-
-        .fault-node .node-number {
-            color: var(--danger);
-        }
-
-
-        /* =====================================================
-           TECHNICAL SPECIFICATION BLOCKS
-        ====================================================== */
-
-        .specification-card {
-            padding: 2rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            margin-bottom: 1.5rem;
-        }
-
-        .specification-number {
-            display: inline-block;
-
-            color: var(--violet);
-
-            font-family: monospace;
-            font-size: 0.8rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .specification-card > h2 {
-            margin-bottom: 1.5rem;
-        }
-
-
-        /* =====================================================
-           DATA CONTRACT LIST
-        ====================================================== */
-
-        .contract-list {
-            display: grid;
-
-            gap: 1rem;
-
-            list-style: none;
-        }
-
-        .contract-item {
-            padding: 1.25rem;
-
-            background: rgba(255, 255, 255, 0.015);
-
-            border-left: 2px solid var(--cyan);
-        }
-
-        .contract-item strong {
-            display: block;
-
-            color: var(--text-primary);
-
-            margin-bottom: 0.5rem;
-        }
-
-        .contract-item p {
-            font-size: 0.92rem;
-        }
-
-
-        /* =====================================================
-           CODE / TECHNICAL EXPRESSIONS
-        ====================================================== */
-
-        code {
-            display: inline-block;
-
-            padding: 0.1rem 0.4rem;
-
-            background: #08090c;
-
-            border: 1px solid var(--border);
-            border-radius: 4px;
-
-            color: var(--cyan);
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-size: 0.85em;
-        }
-
-
-        /* =====================================================
-           IDEMPOTENCY FLOW
-        ====================================================== */
-
-        .process-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
-
-            gap: 1rem;
-
-            margin-top: 1.5rem;
-        }
-
-        .process-step {
-            padding: 1.25rem;
-
-            background: var(--surface-light);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-
-        .process-step span {
-            display: block;
-
-            color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .process-step h3 {
-            font-size: 0.95rem;
-        }
-
-
-        /* =====================================================
-           FAULT CONTAINMENT
-        ====================================================== */
-
-        .fault-container {
-            border-left: 3px solid var(--danger);
-
-            padding: 1.5rem;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(248, 113, 113, 0.05),
-                    transparent
-                );
-        }
-
-        .fault-status {
-            display: inline-block;
-
-            margin-bottom: 1rem;
-
-            padding: 0.3rem 0.6rem;
-
-            background: rgba(248, 113, 113, 0.1);
-
-            border: 1px solid rgba(248, 113, 113, 0.4);
-            border-radius: 4px;
-
-            color: var(--danger);
-
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ====================================================== */
-
-        footer {
-            padding-top: 2rem;
-
-            border-top: 1px solid var(--border);
-
-            color: var(--text-muted);
-
-            font-size: 0.75rem;
-            letter-spacing: 0.08em;
-            text-align: center;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ====================================================== */
-
-        @media (max-width: 600px) {
-
-            .container {
-                width: min(100% - 2rem, 1200px);
-
-                padding-top: 2.5rem;
-            }
-
-            .specification-card {
-                padding: 1.25rem;
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Enterprise Automation Scheduling & Webhook Data Routing</title>
+
+<style>
+:root {
+    --background: #09090b;
+    --surface: #101217;
+    --surface-light: #161922;
+    --border: #272a32;
+    --cyan: #22d3ee;
+    --violet: #7658A6;
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 10px;
+    --transition: 0.25s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(34, 211, 238, 0.045),
+            transparent 32%
+        ),
+        var(--background);
+
+    color: var(--text-primary);
+    font-family: Inter, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.7;
+}
+
+.container {
+    width: min(1200px, calc(100% - 2.5rem));
+    margin: 0 auto;
+    padding: 4rem 0 6rem;
+}
+
+/* HEADER */
+
+.document-header {
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4rem;
+}
+
+.eyebrow,
+.section-label {
+    color: var(--cyan);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.85rem;
+}
+
+h1 {
+    max-width: 1000px;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    color: var(--violet);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 1.75rem;
+}
+
+.overview {
+    max-width: 900px;
+    color: var(--text-secondary);
+    font-size: 1.02rem;
+}
+
+/* METADATA */
+
+.metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+}
+
+.metadata-item {
+    padding: 0.5rem 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+}
+
+.metadata-item strong {
+    color: var(--text-primary);
+}
+
+/* GENERAL SECTIONS */
+
+section {
+    margin-bottom: 4rem;
+}
+
+h2 {
+    font-size: clamp(1.5rem, 3vw, 2.15rem);
+    line-height: 1.3;
+    margin-bottom: 1.5rem;
+}
+
+h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.85rem;
+}
+
+p {
+    color: var(--text-secondary);
+}
+
+.section-intro {
+    max-width: 900px;
+    margin-bottom: 1.75rem;
+}
+
+/* DATAFLOW DIAGRAM */
+
+.dataflow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.flow-node {
+    width: min(100%, 700px);
+    padding: 1.3rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    text-align: center;
+    transition: var(--transition);
+}
+
+.flow-node:hover {
+    border-color: var(--cyan);
+    transform: translateY(-3px);
+    box-shadow: 0 0 22px rgba(34, 211, 238, 0.08);
+}
+
+.flow-node h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+}
+
+.flow-node p {
+    font-size: 0.85rem;
+}
+
+.flow-node.primary {
+    border-color: var(--violet);
+}
+
+.flow-node.terminal {
+    border-color: var(--cyan);
+}
+
+.flow-number {
+    display: block;
+    color: var(--cyan);
+    font-family: monospace;
+    font-size: 0.7rem;
+    margin-bottom: 0.4rem;
+}
+
+.flow-arrow {
+    height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan);
+    font-family: monospace;
+    font-size: 1.3rem;
+}
+
+.flow-arrow span {
+    width: 1px;
+    height: 18px;
+    background: var(--cyan);
+}
+
+.flow-arrow strong {
+    font-size: 0.8rem;
+}
+
+/* ROUTING BRANCHES */
+
+.routing-branches {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 900px;
+    margin: 1.5rem 0;
+}
+
+.branch {
+    padding: 1.2rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.branch h3 {
+    color: var(--cyan);
+    font-size: 0.9rem;
+}
+
+.branch p {
+    font-size: 0.82rem;
+}
+
+/* SPECIFICATION CARDS */
+
+.specification-card {
+    padding: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+    transition: var(--transition);
+}
+
+.specification-card:hover {
+    border-color: #3b4655;
+}
+
+.specification-header {
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.specification-number {
+    display: block;
+    color: var(--cyan);
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+}
+
+.specification-header h2 {
+    margin-bottom: 0;
+}
+
+/* TECHNICAL LISTS */
+
+.technical-list {
+    list-style: none;
+    margin-top: 1.2rem;
+}
+
+.technical-list li {
+    position: relative;
+    padding: 0.85rem 0 0.85rem 1.4rem;
+    border-bottom: 1px solid rgba(39, 42, 50, 0.7);
+    color: var(--text-secondary);
+}
+
+.technical-list li::before {
+    content: "▹";
+    position: absolute;
+    left: 0;
+    color: var(--cyan);
+}
+
+.technical-list strong {
+    color: var(--text-primary);
+}
+
+/* CALLOUTS */
+
+.technical-callout {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: var(--surface-light);
+    border-left: 3px solid var(--violet);
+    border-radius: 0 6px 6px 0;
+}
+
+.technical-callout strong {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.technical-callout p {
+    font-size: 0.92rem;
+}
+
+code {
+    color: var(--cyan);
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.88em;
+    overflow-wrap: anywhere;
+}
+
+/* INTEGRATION MAPPING */
+
+.mapping-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.mapping-card {
+    padding: 1.2rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.mapping-card .field {
+    color: var(--cyan);
+    font-family: monospace;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.mapping-card p {
+    font-size: 0.85rem;
+}
+
+/* FAULT MONITORING */
+
+.fault-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.fault-card {
+    padding: 1.3rem;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.fault-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--cyan);
+}
+
+.fault-status {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+    font-family: monospace;
+    font-size: 0.7rem;
+    margin-bottom: 0.8rem;
+}
+
+.fault-card h3 {
+    font-size: 0.95rem;
+}
+
+.fault-card p {
+    font-size: 0.85rem;
+}
+
+/* TECHNOLOGY TAGS */
+
+.stack-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+}
+
+.stack-tag {
+    padding: 0.35rem 0.7rem;
+    background: rgba(34, 211, 238, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+/* FOOTER */
+
+footer {
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+    .container {
+        width: calc(100% - 2rem);
+        padding-top: 2.5rem;
+    }
+
+    .specification-card {
+        padding: 1.25rem;
+    }
+
+    .routing-branches {
+        grid-template-columns: 1fr;
+    }
+
+    .flow-node {
+        padding: 1rem;
+    }
+}
+
+/* PRINT */
+
+@media print {
+    body {
+        background: white;
+        color: #111;
+    }
+
+    .specification-card,
+    .flow-node,
+    .branch,
+    .fault-card {
+        background: white;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+
+    p,
+    .technical-list li {
+        color: #333;
+    }
+
+    .container {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+</style>
 </head>
-
 
 <body>
 
-    <main class="container">
+<main class="container">
+
+    <!-- DOCUMENT HEADER -->
 
-        /* =====================================================
-           DOCUMENT HEADER
-        ====================================================== */
+    <header class="document-header">
+
+        <p class="eyebrow">
+            ENTERPRISE AUTOMATION // CLOUD INTEGRATION
+        </p>
+
+        <h1>
+            Enterprise Automation Scheduling &amp; Webhook Data Routing
+        </h1>
+
+        <p class="subtitle">
+            Cloud Integration Architecture &amp;
+            System Interaction Matrix
+        </p>
+
+        <p class="overview">
+            A decoupled cloud integration architecture designed to
+            coordinate scheduled upstream exports, intercept and
+            normalize multi-source webhook payloads, route structured
+            data through secure REST boundaries, and protect downstream
+            relational systems through automated exception handling
+            and forensic monitoring.
+        </p>
+
+        <div class="metadata">
+            <span class="metadata-item">
+                <strong>Status:</strong> Production Active / Highly Resilient Cloud Core
+            </span>
+
+            <span class="metadata-item">
+                <strong>Architect:</strong> Angelique Greyling
+            </span>
+
+            <span class="metadata-item">
+                <strong>Scale:</strong> Multi-Source Payload Router
+            </span>
+
+            <span class="metadata-item">
+                <strong>Latency Profile:</strong> Sub-Second Target
+            </span>
+        </div>
+
+    </header>
 
-        .document-header {
-            padding-bottom: 2.5rem;
 
-            border-bottom: 1px solid var(--border);
-
-            margin-bottom: 4rem;
-        }
-
-        .eyebrow {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            max-width: 1000px;
-
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-
-            margin-bottom: 1rem;
-        }
-
-        .subtitle {
-            color: var(--violet);
-
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-
-            margin-bottom: 1.75rem;
-        }
-
-        .overview {
-            max-width: 900px;
-
-            color: var(--text-secondary);
-
-            font-size: 1.05rem;
-        }
-
-
-        /* =====================================================
-           GENERAL SECTION STYLING
-        ====================================================== */
-
-        section {
-            margin-bottom: 4rem;
-        }
-
-        .section-label {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 0.75rem;
-        }
-
-        h2 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-
-            margin-bottom: 1.5rem;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-
-            margin-bottom: 1rem;
-        }
-
-        p {
-            color: var(--text-secondary);
-        }
-
-
-        /* =====================================================
-           INBOUND ARCHITECTURE MAP
-        ====================================================== */
-
-        .architecture-map {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(210px, 1fr));
-
-            gap: 1rem;
-        }
-
-        .architecture-node {
-            position: relative;
-
-            min-height: 180px;
-
-            padding: 1.5rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            transition:
-                transform var(--transition),
-                border-color var(--transition),
-                box-shadow var(--transition);
-        }
-
-        .architecture-node:hover {
-            transform: translateY(-4px);
-
-            border-color: var(--cyan);
-
-            box-shadow:
-                0 0 25px rgba(34, 211, 238, 0.08);
-        }
-
-        .node-number {
-            display: block;
-
-            color: var(--violet);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 1rem;
-        }
-
-        .architecture-node h3 {
-            color: var(--text-primary);
-
-            font-size: 1rem;
-            line-height: 1.4;
-        }
-
-        .architecture-node p {
-            font-size: 0.88rem;
-        }
-
-
-        /* =====================================================
-           SPECIFICATION CARDS
-        ====================================================== */
-
-        .specification-card {
-            padding: 2rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            margin-bottom: 2rem;
-        }
-
-        .specification-header {
-            padding-bottom: 1.5rem;
-
-            border-bottom: 1px solid var(--border);
-
-            margin-bottom: 1.5rem;
-        }
-
-        .specification-number {
-            display: block;
-
-            color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 0.5rem;
-        }
-
-        .specification-header h2 {
-            margin-bottom: 0;
-        }
-
-
-        /* =====================================================
-           TECHNICAL CALLOUTS
-        ====================================================== */
-
-        .technical-callout {
-            margin-top: 1.5rem;
-
-            padding: 1.25rem;
-
-            background: var(--surface-light);
-
-            border-left: 3px solid var(--violet);
-        }
-
-        .technical-callout strong {
-            display: block;
-
-            color: var(--text-primary);
-
-            margin-bottom: 0.5rem;
-        }
-
-
-        /* =====================================================
-           CODE BLOCK
-        ====================================================== */
-
-        .code-container {
-            margin-top: 1.5rem;
-
-            background: #08090c;
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            overflow: hidden;
-        }
-
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            padding: 0.75rem 1rem;
-
-            background: var(--surface-light);
-
-            border-bottom: 1px solid var(--border);
-        }
-
-        .code-language {
-            color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .code-label {
-            color: var(--text-muted);
-
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-        }
-
-        pre {
-            overflow-x: auto;
-
-            padding: 1.5rem;
-
-            color: #d4d4d8;
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-size: 0.82rem;
-            line-height: 1.7;
-        }
-
-        code {
-            font-family: inherit;
-        }
-
-
-        /* =====================================================
-           ANALYTICS FLOW
-        ====================================================== */
-
-        .analytics-flow {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
-
-            gap: 1rem;
-
-            margin-top: 1.5rem;
-        }
-
-        .analytics-step {
-            padding: 1.5rem;
-
-            background: var(--surface-light);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            transition:
-                transform var(--transition),
-                border-color var(--transition);
-        }
-
-        .analytics-step:hover {
-            transform: translateY(-3px);
-
-            border-color: var(--cyan);
-        }
-
-        .analytics-step span {
-            display: block;
-
-            color: var(--success);
-
-            font-family: monospace;
-            font-size: 0.7rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .analytics-step h3 {
-            font-size: 1rem;
-        }
-
-        .analytics-step p {
-            font-size: 0.88rem;
-        }
-
-
-        /* =====================================================
-           TECHNOLOGY TAGS
-        ====================================================== */
-
-        .stack-tags {
-            display: flex;
-            flex-wrap: wrap;
-
-            gap: 0.6rem;
-
-            margin-top: 1.5rem;
-        }
-
-        .stack-tag {
-            padding: 0.35rem 0.7rem;
-
-            background: rgba(34, 211, 238, 0.05);
-
-            border: 1px solid var(--border);
-            border-radius: 999px;
-
-            color: var(--text-secondary);
-
-            font-size: 0.75rem;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ====================================================== */
-
-        footer {
-            padding-top: 2rem;
-
-            border-top: 1px solid var(--border);
-
-            color: var(--text-muted);
-
-            font-size: 0.72rem;
-            letter-spacing: 0.08em;
-
-            text-align: center;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE DESIGN
-        ====================================================== */
-
-        @media (max-width: 700px) {
-
-            .container {
-                width: min(100% - 2rem, 1200px);
-
-                padding-top: 2.5rem;
-            }
-
-            .specification-card {
-                padding: 1.25rem;
-            }
-
-            pre {
-                padding: 1rem;
-
-                font-size: 0.72rem;
-            }
-
-        }
-
-    </style>
-</head>
-
-
-<body>
-
-    <main class="container">
-
-
-        <!-- =====================================================
-             DOCUMENT HEADER
-        ====================================================== -->
-
-        <header class="document-header">
-
-            <p class="eyebrow">
-                ENTERPRISE AUTOMATION // ANALYTICS ARCHITECTURE
-            </p>
-
-            <h1>
-                Automated Enterprise Snapshot Aggregator &amp; Analytics Framework
-            </h1>
-
-            <p class="subtitle">
-                Technical Architecture Specification &amp;
-                Automated Spreadsheet Normalization Pipeline
-            </p>
-
-            <p class="overview">
-                This infrastructure specification outlines a
-                production-grade automated pipeline designed to ingest
-                daily operational snapshot reporting data, handle
-                multi-source data transformations, and generate
-                structured data models optimized for executive-ready
-                analytical dashboards.
-            </p>
-
-        </header>
-
-
-        <!-- =====================================================
-             INBOUND ARCHITECTURE MAP
-        ====================================================== -->
-
-        <section>
-
-            <p class="section-label">
-                SYSTEM MAP // INBOUND ARCHITECTURE
-            </p>
+    <!-- ENTERPRISE DATAFLOW MAP -->
+
+    <section>
+
+        <p class="section-label">
+            SYSTEM MAP // ENTERPRISE DATAFLOW
+        </p>
+
+        <h2>Cloud Integration &amp; Routing Architecture</h2>
+
+        <p class="section-intro">
+            The integration perimeter separates scheduled source exports
+            from downstream database execution. Middleware acts as the
+            orchestration and transformation boundary between external
+            event notifications and internal relational data contracts.
+        </p>
+
+        <div class="dataflow">
+
+            <div class="flow-node">
+                <span class="flow-number">SOURCE LAYER // 01</span>
+                <h3>UPSTREAM EXPORTS</h3>
+                <p>Automated CSV blobs and transactional export events</p>
+            </div>
+
+            <div class="flow-arrow">
+                <span></span>
+                <strong>▼</strong>
+            </div>
+
+            <div class="flow-node primary">
+                <span class="flow-number">SCHEDULING LAYER // 02</span>
+                <h3>ZAPIER SCHEDULER</h3>
+                <p>Scheduled trigger orchestration and controlled polling gate</p>
+            </div>
+
+            <div class="flow-arrow">
+                <span></span>
+                <strong>▼</strong>
+            </div>
+
+            <div class="flow-node">
+                <span class="flow-number">MIDDLEWARE LAYER // 03</span>
+                <h3>MIDDLEWARE ROUTER</h3>
+                <p>Payload interception, field normalization and routing logic</p>
+            </div>
+
+            <div class="routing-branches">
+
+                <article class="branch">
+                    <h3>REST ENDPOINTS</h3>
+                    <p>Webhook drops and outbound HTTP communication</p>
+                </article>
+
+                <article class="branch">
+                    <h3>BUFFER PROCESSING</h3>
+                    <p>Base64 decoding and payload partitioning</p>
+                </article>
+
+                <article class="branch">
+                    <h3>STAGE 1 INTAKE</h3>
+                    <p>Schema validation and parameter boundary checks</p>
+                </article>
+
+            </div>
+
+            <div class="flow-arrow">
+                <span></span>
+                <strong>▼</strong>
+            </div>
+
+            <div class="flow-node terminal">
+                <span class="flow-number">TARGET LAYER // 04</span>
+                <h3>PRODUCTION ENGINES</h3>
+                <p>SQL ingestion, relational overwrites and B-Tree index optimization</p>
+            </div>
+
+        </div>
+
+        <div class="stack-tags">
+            <span class="stack-tag">Zapier</span>
+            <span class="stack-tag">Webhooks</span>
+            <span class="stack-tag">REST API</span>
+            <span class="stack-tag">JSON</span>
+            <span class="stack-tag">Base64</span>
+            <span class="stack-tag">PostgreSQL</span>
+            <span class="stack-tag">SQL</span>
+            <span class="stack-tag">SHA-256</span>
+        </div>
+
+    </section>
+
+
+    <!-- STAGE 1 -->
+
+    <section class="specification-card">
+
+        <div class="specification-header">
+            <span class="specification-number">
+                STAGE 01 // WEBHOOK INGESTION
+            </span>
 
             <h2>
-                Automated Data Processing Architecture
+                Webhook Ingestion Perimeter &amp; Trigger Tuning
             </h2>
+        </div>
 
+        <h3>1. Inbound Ingestion Logic</h3>
 
-            <div class="architecture-map">
+        <p>
+            The event-driven pipeline initializes through an automated
+            daily ingestion trigger. Rather than exposing standard
+            open APIs to uncontrolled external connections,
+            transaction notifications are routed through a secure,
+            encrypted Zapier Webhook Listener Gateway.
+        </p>
 
+        <h3 style="margin-top: 1.5rem;">
+            2. Payload Interception Specifications
+        </h3>
 
-                <!-- DATA SOURCE -->
+        <ul class="technical-list">
 
-                <article class="architecture-node">
+            <li>
+                <strong>Catch Webhook Action:</strong>
+                The pipeline listens on a unique, obfuscated SSL endpoint.
+                Upstream systems push notification payloads upon file
+                export compilation events.
+            </li>
 
-                    <span class="node-number">
-                        LAYER 01
-                    </span>
+            <li>
+                <strong>Header Authentication Validation:</strong>
+                Inbound packets are inspected for expected corporate
+                security tokens before payload parsing begins.
+                Invalid or corrupt metadata configurations trigger
+                boundary rejection.
+            </li>
 
-                    <h3>
-                        Data Source
-                    </h3>
+        </ul>
 
-                    <p>
-                        Operational data captured through automated
-                        form endpoints.
-                    </p>
-
-                </article>
-
-
-                <!-- EXTRACTION -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 02
-                    </span>
-
-                    <h3>
-                        Data Extraction Layer
-                    </h3>
-
-                    <p>
-                        Proxy scripts monitoring mailboxes and
-                        extracting report files.
-                    </p>
-
-                </article>
-
-
-                <!-- STORAGE -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 03
-                    </span>
-
-                    <h3>
-                        Intermediate Storage
-                    </h3>
-
-                    <p>
-                        Google Drive for raw snapshots and SharePoint
-                        for the processed ledger.
-                    </p>
-
-                </article>
-
-
-                <!-- AUTOMATION -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 04
-                    </span>
-
-                    <h3>
-                        Automation Processing
-                    </h3>
-
-                    <p>
-                        Power Automate orchestration and TypeScript
-                        table formatting.
-                    </p>
-
-                </article>
-
-
-                <!-- ANALYTICS -->
-
-                <article class="architecture-node">
-
-                    <span class="node-number">
-                        LAYER 05
-                    </span>
-
-                    <h3>
-                        Analytics Visualization
-                    </h3>
-
-                    <p>
-                        Power BI models and cloud scheduled refreshes.
-                    </p>
-
-                </article>
-
-            </div>
-
-
-            <div class="stack-tags">
-
-                <span class="stack-tag">
-                    Automated Forms
-                </span>
-
-                <span class="stack-tag">
-                    Google Apps Script
-                </span>
-
-                <span class="stack-tag">
-                    Google Drive
-                </span>
-
-                <span class="stack-tag">
-                    Power Automate
-                </span>
-
-                <span class="stack-tag">
-                    Office Scripts
-                </span>
-
-                <span class="stack-tag">
-                    SharePoint
-                </span>
-
-                <span class="stack-tag">
-                    Power BI
-                </span>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             SECTION 01
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <div class="specification-header">
-
-                <span class="specification-number">
-                    SPECIFICATION 01 // EXTRACTION
-                </span>
-
-                <h2>
-                    Automated Extraction &amp; Repository Management
-                </h2>
-
-            </div>
-
-
+        <div class="technical-callout">
+            <strong>Perimeter Security Principle</strong>
             <p>
-                The pipeline replaces manual extraction loops with an
-                automated scripting proxy. A dedicated script monitors
-                the inbound data inbox, captures incoming spreadsheet
-                attachments, commits the raw snapshot rows directly into
-                an archival folder structure, and clears the processed
-                message container to isolate the transaction and prevent
-                multi-pass file duplication.
+                Authentication and metadata validation occur before
+                downstream transformation or database operations.
+                This creates an explicit trust boundary between
+                external notification sources and internal processing.
             </p>
+        </div>
+
+    </section>
 
 
-            <div class="technical-callout">
+    <!-- STAGE 2 -->
 
-                <strong>
-                    Architectural Objective
-                </strong>
+    <section class="specification-card">
 
-                <p>
-                    Raw snapshots are retained separately from downstream
-                    processed records, creating a clear boundary between
-                    source data preservation and analytical data
-                    transformation.
-                </p>
+        <div class="specification-header">
+            <span class="specification-number">
+                STAGE 02 // MIDDLEWARE TRANSFORMATION
+            </span>
 
-            </div>
+            <h2>
+                Middleware Flattening &amp; Base64 Buffer Conversion
+            </h2>
+        </div>
 
-        </section>
+        <h3>1. Data Type Normalization</h3>
 
+        <p>
+            Raw tracking payloads may contain binary attachments
+            or complex nested multi-select parameters. To reduce
+            unnecessary transfer overhead and prevent relational
+            table blocking, Zapier operates as a lightweight
+            orchestration and transformation router.
+        </p>
 
-        <!-- =====================================================
-             SECTION 02
-        ====================================================== -->
+        <h3 style="margin-top: 1.5rem;">
+            2. Technical Execution Mechanics
+        </h3>
 
-        <section class="specification-card">
+        <ul class="technical-list">
 
-            <div class="specification-header">
+            <li>
+                <strong>Buffer Stream Partitioning:</strong>
+                JSON bodies containing large text parameters or
+                multi-byte character lists are separated into
+                isolated field records and clean key-value pairs.
+            </li>
 
-                <span class="specification-number">
-                    SPECIFICATION 02 // NORMALIZATION
-                </span>
+            <li>
+                <strong>Attachment Pointer Extraction:</strong>
+                Rather than transferring large binary objects across
+                web networks, the pipeline extracts the secure cloud
+                destination URL and maps it as a text attribute.
+                This maintains the specified payload-size target
+                below 50KB.
+            </li>
 
-                <h2>
-                    TypeScript Data Normalization Loop
-                </h2>
+        </ul>
 
-            </div>
-
-
+        <div class="technical-callout">
+            <strong>Payload Optimization Strategy</strong>
             <p>
-                Upon repository file drop detection, an automated
-                workflow calls a custom TypeScript Office Script to
-                standardize unstructured grid data into clean tables
-                before downstream analytics systems query the row models.
+                Binary data and transactional metadata follow separate
+                transfer paths. Reference pointers are passed through
+                the integration layer instead of repeatedly transferring
+                the underlying attachment objects.
             </p>
+        </div>
+
+    </section>
 
 
-            <!-- CODE BLOCK -->
+    <!-- STAGE 3 -->
 
-            <div class="code-container">
+    <section class="specification-card">
 
-                <div class="code-header">
+        <div class="specification-header">
+            <span class="specification-number">
+                STAGE 03 // REST DATABASE INGESTION
+            </span>
 
-                    <span class="code-language">
-                        TYPESCRIPT
-                    </span>
+            <h2>
+                REST Target Gateway Ingestion &amp; schema.sql Dispatch
+            </h2>
+        </div>
 
-                    <span class="code-label">
-                        OFFICE SCRIPT // NORMALIZATION ENGINE
-                    </span>
+        <h3>1. Relational Mapping Mechanics</h3>
 
-                </div>
+        <p>
+            Once the incoming data contracts have been flattened
+            and normalized, Zapier issues an automated outbound
+            REST API POST request to communicate with the downstream
+            data-lake architecture boundaries.
+        </p>
 
+        <h3 style="margin-top: 1.5rem;">
+            2. Enterprise Schema Alignment
+        </h3>
 
-                <pre><code>function main(workbook: ExcelScript.Workbook) {
+        <p>
+            Incoming fields are mapped against the PostgreSQL
+            operational framework tables through defined
+            relational insertion contracts.
+        </p>
 
-    // Access target data sheet layer
-    let targetSheet = workbook.getActiveWorksheet();
-    let usedRange = targetSheet.getUsedRange();
+        <div class="mapping-grid">
 
-    if (usedRange) {
-
-        let rowCount = usedRange.getRowCount();
-        let colCount = usedRange.getColumnCount();
-
-        // Unmerge nested layout block headers
-        // to clean the table space
-        usedRange.unmerge();
-
-        // Algorithmic column normalization
-        for (let col = 0; col &lt; colCount; col++) {
-
-            let firstHeaderValue =
-                targetSheet
-                    .getCell(0, col)
-                    .getValue() as string;
-
-            // Clean and normalize column header names
-            if (firstHeaderValue) {
-
-                let sanitizedHeader =
-                    firstHeaderValue
-                        .trim()
-                        .toLowerCase()
-                        .replace(/\s+/g, '_');
-
-                targetSheet
-                    .getCell(0, col)
-                    .setValue(sanitizedHeader);
-            }
-        }
-
-        // Force sanitized data into a
-        // structured Table Object mapping contract
-        let activeTable =
-            workbook.addTable(
-                usedRange.getAddress(),
-                true
-            );
-
-        activeTable.setName(
-            "Canonical_Operational_Ledger"
-        );
-    }
-}</code></pre>
-
-            </div>
-
-
-            <div class="technical-callout">
-
-                <strong>
-                    Canonical Data Contract
-                </strong>
-
+            <article class="mapping-card">
+                <div class="field">employee_id</div>
                 <p>
-                    The normalization process converts a variable,
-                    presentation-oriented spreadsheet layout into the
-                    structured
-                    <code>Canonical_Operational_Ledger</code> table
-                    contract, providing a consistent boundary for
-                    downstream processing and analytics.
+                    Maps against
+                    <code>dim_employees(employee_id)</code>
+                    to enforce employee master-directory
+                    foreign-key validation.
                 </p>
+            </article>
 
-            </div>
+            <article class="mapping-card">
+                <div class="field">timestamp</div>
+                <p>
+                    Maps into <code>fact_time_logs</code>
+                    using ISO-8601 formatted timestamp strings
+                    with explicit timezone handling.
+                </p>
+            </article>
 
-        </section>
+            <article class="mapping-card">
+                <div class="field">is_system_issue_found</div>
+                <p>
+                    Maps into
+                    <code>fact_asset_checklists</code>
+                    as a validated boolean variable.
+                </p>
+            </article>
 
+        </div>
 
-        <!-- =====================================================
-             SECTION 03
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <div class="specification-header">
-
-                <span class="specification-number">
-                    SPECIFICATION 03 // ANALYTICS
-                </span>
-
-                <h2>
-                    Power BI Analytical Modeling Layer
-                </h2>
-
-            </div>
-
-
+        <div class="technical-callout">
+            <strong>Relational Integrity Boundary</strong>
             <p>
-                The structural table is published directly into a secure
-                corporate workspace where Power BI executes scheduled
-                refreshes against the processed records. Complex
-                spreadsheet modifications are handled upstream within the
-                automation layer, allowing the analytical model to remain
-                focused on semantic calculations and executive reporting.
+                The staging intake layer validates incoming
+                identifiers, data types and timestamp formats
+                before allowing transactional records to reach
+                their target relational tables.
             </p>
+        </div>
+
+    </section>
 
 
-            <div class="analytics-flow">
+    <!-- STAGE 4 -->
 
+    <section class="specification-card">
 
-                <article class="analytics-step">
+        <div class="specification-header">
+            <span class="specification-number">
+                STAGE 04 // COMPLIANCE &amp; RESILIENCY
+            </span>
 
-                    <span>
-                        STEP 01
-                    </span>
+            <h2>
+                Compliance Monitoring &amp; Audit Circuit-Breakers
+            </h2>
+        </div>
 
-                    <h3>
-                        Structured Ledger
-                    </h3>
+        <h3>1. Automated Exception Catching</h3>
 
-                    <p>
-                        Normalized snapshot records are committed to the
-                        processed repository.
-                    </p>
+        <p>
+            The automation architecture incorporates a multi-tier
+            error-handling mechanism to intercept integration
+            failures before they propagate into downstream
+            execution layers.
+        </p>
 
-                </article>
+        <h3 style="margin-top: 1.5rem;">
+            2. Fault Isolation Matrices
+        </h3>
 
+        <div class="fault-grid">
 
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 02
-                    </span>
-
-                    <h3>
-                        Scheduled Refresh
-                    </h3>
-
-                    <p>
-                        Power BI retrieves structured records through
-                        automated workspace refresh processes.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 03
-                    </span>
-
-                    <h3>
-                        Semantic Modeling
-                    </h3>
-
-                    <p>
-                        The analytical model remains lightweight and
-                        focused on business logic and DAX calculations.
-                    </p>
-
-                </article>
-
-
-                <article class="analytics-step">
-
-                    <span>
-                        STEP 04
-                    </span>
-
-                    <h3>
-                        Executive Analytics
-                    </h3>
-
-                    <p>
-                        Final dashboards deliver structured operational
-                        insights for management review.
-                    </p>
-
-                </article>
-
-            </div>
-
-
-            <div class="technical-callout">
-
-                <strong>
-                    Processing Boundary Principle
-                </strong>
-
+            <article class="fault-card">
+                <span class="fault-status">HTTP 4XX</span>
+                <h3>Client Exceptions</h3>
                 <p>
-                    Complex structural transformations are completed before
-                    data reaches the analytics layer. This separation keeps
-                    reporting models faster, reduces transformation
-                    overhead, and allows the semantic layer to concentrate
-                    on analytical calculations rather than source-file
-                    remediation.
+                    Invalid requests, rejected authentication
+                    tokens or malformed data contracts
+                    are isolated for investigation.
                 </p>
+            </article>
 
-            </div>
+            <article class="fault-card">
+                <span class="fault-status">HTTP 5XX</span>
+                <h3>Server Exceptions</h3>
+                <p>
+                    Target database outages and downstream
+                    execution failures trigger controlled
+                    processing interruption.
+                </p>
+            </article>
 
-        </section>
+            <article class="fault-card">
+                <span class="fault-status">ALERT LOOP</span>
+                <h3>Incident Notifications</h3>
+                <p>
+                    Out-of-bounds metrics trigger
+                    high-priority webhook notifications
+                    to the designated engineering team.
+                </p>
+            </article>
+
+            <article class="fault-card">
+                <span class="fault-status">SHA-256</span>
+                <h3>Forensic Validation</h3>
+                <p>
+                    Failed batch fingerprints support
+                    integrity verification and
+                    point-in-time forensic investigation.
+                </p>
+            </article>
+
+        </div>
+
+        <div class="technical-callout">
+            <strong>Fault Containment &amp; Recovery Principle</strong>
+            <p>
+                Failed execution batches are isolated rather than
+                silently discarded. Error metadata, response codes
+                and batch validation fingerprints provide a traceable
+                record for subsequent investigation and controlled
+                recovery.
+            </p>
+        </div>
+
+    </section>
 
 
-        <!-- =====================================================
-             FOOTER
-        ====================================================== -->
+    <!-- CLOSING ARCHITECTURE SUMMARY -->
 
-        <footer>
+    <section>
 
-            AUTOMATED ENTERPRISE SNAPSHOT AGGREGATOR
-            &nbsp; // &nbsp;
-            ANALYTICS FRAMEWORK SPECIFICATION
-            &nbsp; // &nbsp;
-            ANGELIQUE GREYLING
+        <p class="section-label">
+            ARCHITECTURAL OUTCOME // SYSTEM RESILIENCY
+        </p>
 
-        </footer>
+        <h2>Decoupled Integration &amp; Controlled Data Delivery</h2>
 
-    </main>
+        <p class="section-intro">
+            The architecture establishes a controlled integration
+            boundary between scheduled upstream exports and
+            production relational systems. Payload validation,
+            middleware normalization, schema alignment and
+            exception monitoring operate as distinct processing
+            responsibilities.
+        </p>
+
+        <div class="mapping-grid">
+
+            <article class="mapping-card">
+                <div class="field">01 / ISOLATION</div>
+                <p>
+                    Controlled webhook entry points and
+                    authenticated inbound notifications.
+                </p>
+            </article>
+
+            <article class="mapping-card">
+                <div class="field">02 / NORMALIZATION</div>
+                <p>
+                    Structured payload conversion and
+                    lightweight attachment routing.
+                </p>
+            </article>
+
+            <article class="mapping-card">
+                <div class="field">03 / INTEGRITY</div>
+                <p>
+                    Validated relational mappings and
+                    controlled database ingestion.
+                </p>
+            </article>
+
+            <article class="mapping-card">
+                <div class="field">04 / RESILIENCY</div>
+                <p>
+                    Exception interception, incident
+                    notifications and forensic traceability.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+        ENTERPRISE AUTOMATION SCHEDULING &amp; WEBHOOK DATA ROUTING
+        <br>
+        CLOUD INTEGRATION ARCHITECTURE
+        // ANGELIQUE GREYLING
+    </footer>
+
+</main>
 
 </body>
 </html>
