@@ -1,843 +1,150 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>
-        Multi-Channel Enterprise Client Onboarding Ingestion Pipeline
-    </title>
-
-    <style>
-
-        /* =====================================================
-           DESIGN VARIABLES
-        ====================================================== */
-
-        :root {
-            --background: #09090b;
-            --surface: #101217;
-            --surface-light: #161922;
-            --border: #272a32;
-
-            --cyan: #22d3ee;
-            --violet: #7658A6;
-
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-
-            --danger: #f87171;
-            --success: #22c55e;
-
-            --radius: 10px;
-        }
-
-
-        /* =====================================================
-           GLOBAL
-        ====================================================== */
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            min-height: 100vh;
-
-            background:
-                radial-gradient(
-                    circle at top right,
-                    rgba(34, 211, 238, 0.04),
-                    transparent 30%
-                ),
-                var(--background);
-
-            color: var(--text-primary);
-
-            font-family:
-                Inter,
-                ui-sans-serif,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                sans-serif;
-
-            line-height: 1.7;
-        }
-
-
-        /* =====================================================
-           PAGE CONTAINER
-        ====================================================== */
-
-        .container {
-            width: min(1200px, calc(100% - 2.5rem));
-            margin: 0 auto;
-
-            padding: 4rem 0 6rem;
-        }
-
-
-        /* =====================================================
-           HEADER
-        ====================================================== */
-
-        .document-header {
-            padding-bottom: 2.5rem;
-
-            border-bottom: 1px solid var(--border);
-
-            margin-bottom: 4rem;
-        }
-
-        .eyebrow {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 1rem;
-        }
-
-        h1 {
-            max-width: 900px;
-
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-
-            margin-bottom: 1rem;
-        }
-
-        .subtitle {
-            color: var(--violet);
-
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-
-        .overview {
-            max-width: 900px;
-
-            margin-top: 2rem;
-
-            color: var(--text-secondary);
-
-            font-size: 1.05rem;
-        }
-
-
-        /* =====================================================
-           SECTION STRUCTURE
-        ====================================================== */
-
-        section {
-            margin-bottom: 4rem;
-        }
-
-        .section-label {
-            color: var(--cyan);
-
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-
-            margin-bottom: 0.75rem;
-        }
-
-        h2 {
-            font-size: clamp(1.5rem, 3vw, 2.25rem);
-
-            margin-bottom: 1.5rem;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-
-            margin-bottom: 1rem;
-        }
-
-        p {
-            color: var(--text-secondary);
-        }
-
-
-        /* =====================================================
-           INGESTION FLOW DIAGRAM
-        ====================================================== */
-
-        .flow-diagram {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(180px, 1fr));
-
-            gap: 1rem;
-
-            align-items: stretch;
-        }
-
-        .flow-node {
-            position: relative;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            min-height: 150px;
-
-            padding: 1.25rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            transition:
-                transform 0.2s ease,
-                border-color 0.2s ease,
-                box-shadow 0.2s ease;
-        }
-
-        .flow-node:hover {
-            transform: translateY(-4px);
-
-            border-color: var(--cyan);
-
-            box-shadow:
-                0 0 20px rgba(34, 211, 238, 0.08);
-        }
-
-        .node-number {
-            display: block;
-
-            color: var(--text-muted);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .flow-node h3 {
-            margin-bottom: 0;
-
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-
-        /* Fault node receives a distinct visual state */
-
-        .fault-node {
-            border-color: rgba(248, 113, 113, 0.35);
-        }
-
-        .fault-node:hover {
-            border-color: var(--danger);
-
-            box-shadow:
-                0 0 20px rgba(248, 113, 113, 0.08);
-        }
-
-        .fault-node .node-number {
-            color: var(--danger);
-        }
-
-
-        /* =====================================================
-           TECHNICAL SPECIFICATION BLOCKS
-        ====================================================== */
-
-        .specification-card {
-            padding: 2rem;
-
-            background: var(--surface);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-
-            margin-bottom: 1.5rem;
-        }
-
-        .specification-number {
-            display: inline-block;
-
-            color: var(--violet);
-
-            font-family: monospace;
-            font-size: 0.8rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .specification-card > h2 {
-            margin-bottom: 1.5rem;
-        }
-
-
-        /* =====================================================
-           DATA CONTRACT LIST
-        ====================================================== */
-
-        .contract-list {
-            display: grid;
-
-            gap: 1rem;
-
-            list-style: none;
-        }
-
-        .contract-item {
-            padding: 1.25rem;
-
-            background: rgba(255, 255, 255, 0.015);
-
-            border-left: 2px solid var(--cyan);
-        }
-
-        .contract-item strong {
-            display: block;
-
-            color: var(--text-primary);
-
-            margin-bottom: 0.5rem;
-        }
-
-        .contract-item p {
-            font-size: 0.92rem;
-        }
-
-
-        /* =====================================================
-           CODE / TECHNICAL EXPRESSIONS
-        ====================================================== */
-
-        code {
-            display: inline-block;
-
-            padding: 0.1rem 0.4rem;
-
-            background: #08090c;
-
-            border: 1px solid var(--border);
-            border-radius: 4px;
-
-            color: var(--cyan);
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-size: 0.85em;
-        }
-
-
-        /* =====================================================
-           IDEMPOTENCY FLOW
-        ====================================================== */
-
-        .process-grid {
-            display: grid;
-
-            grid-template-columns:
-                repeat(auto-fit, minmax(200px, 1fr));
-
-            gap: 1rem;
-
-            margin-top: 1.5rem;
-        }
-
-        .process-step {
-            padding: 1.25rem;
-
-            background: var(--surface-light);
-
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-
-        .process-step span {
-            display: block;
-
-            color: var(--cyan);
-
-            font-family: monospace;
-            font-size: 0.75rem;
-
-            margin-bottom: 0.75rem;
-        }
-
-        .process-step h3 {
-            font-size: 0.95rem;
-        }
-
-
-        /* =====================================================
-           FAULT CONTAINMENT
-        ====================================================== */
-
-        .fault-container {
-            border-left: 3px solid var(--danger);
-
-            padding: 1.5rem;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(248, 113, 113, 0.05),
-                    transparent
-                );
-        }
-
-        .fault-status {
-            display: inline-block;
-
-            margin-bottom: 1rem;
-
-            padding: 0.3rem 0.6rem;
-
-            background: rgba(248, 113, 113, 0.1);
-
-            border: 1px solid rgba(248, 113, 113, 0.4);
-            border-radius: 4px;
-
-            color: var(--danger);
-
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ====================================================== */
-
-        footer {
-            padding-top: 2rem;
-
-            border-top: 1px solid var(--border);
-
-            color: var(--text-muted);
-
-            font-size: 0.75rem;
-            letter-spacing: 0.08em;
-            text-align: center;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ====================================================== */
-
-        @media (max-width: 600px) {
-
-            .container {
-                width: min(100% - 2rem, 1200px);
-
-                padding-top: 2.5rem;
-            }
-
-            .specification-card {
-                padding: 1.25rem;
-            }
-
-        }
-
-    </style>
+    <meta name="description" content="Multi-Channel Enterprise Client Onboarding Ingestion Pipeline - Operational Integration Specification and Core Data Contracts.">
+    <title>Multi-Channel Enterprise Client Onboarding | Angelique Greyling</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
-
 <body>
-
-    <main class="container">
-
-
-        <!-- =====================================================
-             DOCUMENT HEADER
-        ====================================================== -->
-
-        <header class="document-header">
-
-            <p class="eyebrow">
-                PRODUCTION SYSTEM ARCHITECTURE // INTEGRATION SPECIFICATION
-            </p>
-
-            <h1>
-                Multi-Channel Enterprise Client Onboarding Ingestion Pipeline
-            </h1>
-
-            <p class="subtitle">
-                Operational Integration Specification &amp; Core Data Contracts
-            </p>
-
-            <p class="overview">
-                This production system architecture blueprint establishes a
-                fully decoupled, fault-tolerant onboarding perimeter. The
-                pipeline ingests multi-channel account registration telemetry,
-                normalizes incoming field variations at the border, prevents
-                customer record duplication, executes conditional tier
-                allocation routing, and delivers executive digests across
-                centralized communication matrices.
-            </p>
-
-        </header>
-
-
-        <!-- =====================================================
-             INGESTION FLOW
-        ====================================================== -->
-
-        <section>
-
-            <p class="section-label">
-                SYSTEM FLOW // INGESTION PIPELINE
-            </p>
-
-            <h2>Ingestion Flow Diagram</h2>
-
-            <div class="flow-diagram">
-
-                <article class="flow-node">
-
-                    <span class="node-number">
-                        NODE 01
-                    </span>
-
-                    <h3>
-                        Inbound Ingestion Webhook / Staging Gateway
-                    </h3>
-
-                </article>
-
-
-                <article class="flow-node">
-
-                    <span class="node-number">
-                        NODE 02
-                    </span>
-
-                    <h3>
-                        Data Sanitization Engine
-                    </h3>
-
-                    <p>
-                        Passes Data Validation
-                    </p>
-
-                </article>
-
-
-                <article class="flow-node fault-node">
-
-                    <span class="node-number">
-                        FAULT LANE
-                    </span>
-
-                    <h3>
-                        Perimeter Fault Tab
-                    </h3>
-
-                    <p>
-                        Malformed Payload Drop
-                    </p>
-
-                </article>
-
-
-                <article class="flow-node">
-
-                    <span class="node-number">
-                        NODE 03
-                    </span>
-
-                    <h3>
-                        Deduplication Lookup Key Search
-                    </h3>
-
-                </article>
-
-
-                <article class="flow-node">
-
-                    <span class="node-number">
-                        NODE 04
-                    </span>
-
-                    <h3>
-                        Territory Allocation Matrix
-                    </h3>
-
-                </article>
-
-
-                <article class="flow-node">
-
-                    <span class="node-number">
-                        NODE 05
-                    </span>
-
-                    <h3>
-                        Terminal Lifecycle Ledger Commit
-                    </h3>
-
-                </article>
-
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <header class="site-header">
+        <div class="header-content">
+            <div class="title-block">
+                <p class="eyebrow">SYSTEM LOG // SYSTEM 02</p>
+                <h1>Multi-Channel Enterprise Client Onboarding Ingestion Pipeline</h1>
+                <p class="professional-title">Operational Integration Specification &amp; Core Data Contracts</p>
+                <div class="contact-details">
+                    <span><strong>Architect:</strong> Angelique Greyling (Principal Solutions Engineer)</span>
+                    <span class="separator">|</span>
+                    <span><strong>System Context:</strong> Multi-Channel Enterprise Client Onboarding &amp; Lifecycle Management</span>
+                </div>
             </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             INGESTION HYGIENE
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <span class="specification-number">
-                SPECIFICATION 01
-            </span>
-
-            <h2>
-                Ingestion Hygiene &amp; Normalization Formations
-            </h2>
-
-
-            <ul class="contract-list">
-
-                <li class="contract-item">
-
-                    <strong>
-                        Canonical Email Isolation Key
-                    </strong>
-
-                    <p>
-                        Forces all incoming subscriber strings to lowercase
-                        and runs a global trim operation
-                        <code>lower(trim(email))</code>. This collapses
-                        casing and whitespace variants before exact-match
-                        lookup loops execute.
-                    </p>
-
-                </li>
-
-
-                <li class="contract-item">
-
-                    <strong>
-                        E.164 Phone Normalization
-                    </strong>
-
-                    <p>
-                        Strips formatting punctuation characters
-                        <code>( ) - .</code> upstream and enforces a
-                        text-string layout starting with a leading plus
-                        sign constraint, preventing spreadsheet engines
-                        from applying automatic numeric coercion.
-                    </p>
-
-                </li>
-
-
-                <li class="contract-item">
-
-                    <strong>
-                        Currency Parameter Partitioning
-                    </strong>
-
-                    <p>
-                        Converts raw currency strings containing symbols
-                        such as <code>$</code> and <code>,</code> into
-                        pure numeric decimals before loop summary
-                        aggregation occurs, separating mathematical
-                        processing from view formatting rules.
-                    </p>
-
-                </li>
-
-            </ul>
-
-        </section>
-
-
-        <!-- =====================================================
-             IDEMPOTENCY
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <span class="specification-number">
-                SPECIFICATION 02
-            </span>
-
-            <h2>
-                Multi-Pass Idempotency &amp; Lifecycle Protections
-            </h2>
-
-            <p>
-                Before executing database modifications, the pipeline
-                executes a historical search bounded by a strict
-                <code>Limit = 1</code> condition using the sanitized
-                email lookup key.
-            </p>
-
-
-            <div class="process-grid">
-
-                <article class="process-step">
-
-                    <span>
-                        STEP 01
-                    </span>
-
-                    <h3>
-                        Sanitize Lookup Key
-                    </h3>
-
-                    <p>
-                        Normalize the incoming email before database
-                        comparison.
-                    </p>
-
-                </article>
-
-
-                <article class="process-step">
-
-                    <span>
-                        STEP 02
-                    </span>
-
-                    <h3>
-                        Historical Lookup
-                    </h3>
-
-                    <p>
-                        Execute an exact-match search with
-                        <code>Limit = 1</code>.
-                    </p>
-
-                </article>
-
-
-                <article class="process-step">
-
-                    <span>
-                        STEP 03
-                    </span>
-
-                    <h3>
-                        Branch Decision
-                    </h3>
-
-                    <p>
-                        Determine whether the record is new or represents
-                        a retry execution.
-                    </p>
-
-                </article>
-
-
-                <article class="process-step">
-
-                    <span>
-                        STEP 04
-                    </span>
-
-                    <h3>
-                        Protected Update
-                    </h3>
-
-                    <p>
-                        Modify mutable fields only and suppress duplicate
-                        lifecycle communications.
-                    </p>
-
-                </article>
-
+            <div class="system-clock">
+                <span class="clock-label">STATUS</span>
+                <span class="status-badge" style="background: rgba(34, 211, 238, 0.1); border-color: var(--cyan); color: var(--cyan);">OPERATIONAL / FAULT-TOLERANT</span>
             </div>
+        </div>
+    </header>
 
-
-            <p style="margin-top: 1.5rem;">
-                If a record already exists, the workflow branches to an
-                update path. It modifies only mutable fields, such as
-                contract value metrics, and appends a timestamped note
-                tracking the retry execution. Welcome messages and
-                representative alerts are completely suppressed.
-            </p>
-
-        </section>
-
-
-        <!-- =====================================================
-             FAULT CONTAINMENT
-        ====================================================== -->
-
-        <section class="specification-card">
-
-            <span class="specification-number">
-                SPECIFICATION 03
-            </span>
-
-            <h2>
-                Localized Fault Containment
-            </h2>
-
-
-            <div class="fault-container">
-
-                <span class="fault-status">
-                    400_BAD_REQUEST
-                </span>
-
-                <p>
-                    To prevent silent scenario loop failure, dedicated error
-                    handlers are appended to outbound message boundaries.
-                    If a communication endpoint times out or drops
-                    connectivity, the local error lane intercepts the
-                    exception and records a forensic status into an internal
-                    errors tracking tab.
-                </p>
-
-                <p style="margin-top: 1rem;">
-                    The system then routes an incident alert to the system
-                    manager. The fault lane terminates through a native
-                    <code>Resume</code> directive with a safe fallback
-                    token, allowing the primary execution pipeline to
-                    continue running without unnecessary interruption.
-                </p>
-
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+    <main>
+        <!-- SYSTEM CONTEXT & PIPELINE TOPOLOGY -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">01 // INGESTION TOPOLOGY</p>
+                <h2>System Context &amp; Pipeline Flow</h2>
             </div>
-
+            <div style="background: var(--card-background); border: 1px solid var(--border); padding: 2rem; border-radius: var(--card-radius); font-family: monospace; white-space: pre; overflow-x: auto; color: var(--cyan); line-height: 1.4; font-size: 0.9rem;">
+ [MULTI-CHANNEL CLIENT REGISTRATION]
+                  │
+                  ▼
+       [INBOUND WEBHOOK / STAGING GATEWAY]
+                  │
+                  ▼
+          [DATA SANITIZATION ENGINE]
+                  │
+          ┌───────┴────────┐
+          ▼                ▼
+   [VALIDATION PASS]  [PERIMETER FAULT TAB]
+          │            • Malformed Payload Drop
+          ▼
+   [DEDUPLICATION LOOKUP]
+          │
+          ▼
+   [TERRITORY ALLOCATION MATRIX]
+          │
+          ▼
+   [TERMINAL LIFECYCLE LEDGER COMMIT]
+          │
+          ▼
+   [CENTRALIZED COMMUNICATION MATRICES]</div>
         </section>
 
+        <!-- INGESTION HYGIENE & NORMALIZATION -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">02 // DATA PERIMETER ENGINEERING</p>
+                <h2>Ingestion Hygiene &amp; Normalization Formations</h2>
+            </div>
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Canonical Email Isolation Key</h4>
+                    <p>All incoming subscriber email strings are normalized through a lowercase conversion and global whitespace trim operation using <code>lower(trim(email))</code>. This establishes a canonical identity lookup key, collapsing casing and leading or trailing whitespace variations before exact-match database lookup operations execute.</p>
+                </div>
 
-        <!-- =====================================================
-             FOOTER
-        ====================================================== -->
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. E.164 Phone Normalization</h4>
+                    <p>Incoming telephone values are stripped of formatting punctuation, including parentheses, hyphens and periods, before being standardized into an E.164-compatible text representation. A leading plus sign literal constraint (<code>+27...</code>) is retained to prevent spreadsheet engines from applying automatic numeric coercion and corrupting international dialing prefixes.</p>
+                </div>
 
-        <footer>
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Currency Parameter Partitioning</h4>
+                    <p>Raw currency strings containing presentation symbols, including dollar signs and grouping commas, are converted into pure numeric decimal values before summary and aggregation loops execute. This separates numerical processing from display formatting, preventing currency presentation rules from contaminating downstream mathematical operations.</p>
+                </div>
+            </div>
+        </section>
 
-            MULTI-CHANNEL ENTERPRISE CLIENT ONBOARDING PIPELINE
-            &nbsp; // &nbsp;
-            OPERATIONAL INTEGRATION SPECIFICATION
+        <!-- IDEMPOTENCY & LIFECYCLE PROTECTIONS -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">03 // TRANSACTION INTEGRITY</p>
+                <h2>Multi-Pass Idempotency &amp; Lifecycle Protections</h2>
+            </div>
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Historical Identity Resolution</h4>
+                    <p>Before executing database modifications, the ingestion pipeline performs a historical record lookup using the sanitized canonical email key. The search is explicitly bounded by a strict <code>Limit = 1</code> condition, restricting the lookup to a single matching customer record and preventing unnecessary record iteration.</p>
+                </div>
 
-        </footer>
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Conditional Update Routing</h4>
+                    <p>When an existing customer record is identified, the workflow branches into a controlled update path rather than creating a duplicate record. Only mutable attributes, such as contract value metrics, are modified. A timestamped execution note is appended to preserve a traceable history of the retry event.</p>
+                </div>
 
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Duplicate Communication Suppression</h4>
+                    <p>Existing-record detection explicitly suppresses the initial onboarding communication sequence. Welcome messages and representative alerts are not reissued during retry executions, preventing duplicate customer notifications and unnecessary internal escalation activity. New-record communication logic remains isolated from the existing-record update branch.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOCALIZED FAULT CONTAINMENT -->
+        <section class="content-section">
+            <div class="section-heading">
+                <p class="section-label">04 // RESILIENCE &amp; EXCEPTION GOVERNANCE</p>
+                <h2>Localized Fault Containment</h2>
+            </div>
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Outbound Communication Error Boundaries</h4>
+                    <p>Dedicated error handlers are attached to outbound communication boundaries to prevent individual endpoint failures from silently terminating the wider scenario execution. Communication timeouts and connectivity interruptions are intercepted within their respective local error-handling lanes rather than propagating uncontrolled exceptions across the entire ingestion pipeline.</p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Forensic Error Logging &amp; Escalation</h4>
+                    <p>When a communication endpoint fails, the local error lane records a forensic execution status (<code>400_BAD_REQUEST</code>) within an internal error-tracking tab. The exception is also routed to the system manager through an incident alert, preserving operational visibility and providing a traceable record of the failed communication attempt.</p>
+                </div>
+
+                <div>
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Execution Continuity &amp; Safe Recovery</h4>
+                    <p>The error-handling lane terminates through a native <code>Resume</code> directive with a configured safe fallback token. This allows the broader scenario execution to continue without allowing a localized outbound communication failure to interrupt unrelated processing operations. The result is a fault-contained ingestion architecture with controlled exception recovery and uninterrupted downstream execution where recovery conditions permit.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <!-- =========================================================
+         FOOTER
+    ========================================================== -->
+    <footer class="site-footer">
+        <p>ANGELIQUE GREYLING | SOLUTIONS PORTFOLIO SYSTEM LOGS</p>
+    </footer>
 </body>
 </html>
