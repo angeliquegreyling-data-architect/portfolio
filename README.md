@@ -53,7 +53,7 @@ Operating as an AI-augmented solutions engineer, I maximize development velocity
 6. Relational Schema Database Sandbox: [RELATIONAL-SCHEMA-SANDBOX](RELATIONAL_SCHEMA_SANDBOX.md) [1.74]
     * *Core Architecture:* Enterprise-grade PostgreSQL data schema manifest demonstrating 3NF relational design, dimensional star-schema data modeling, composite foreign-key assignments, and database indexes optimized for performance tracking.
     * *Interactive Sandbox Prototype:* [Launch Live ERD Explorer & SQL Query Analyzer Sandbox](https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-database-erd-analyzer-sandbox.html)
-    * *Source Code Implementation:* [Review Pure PostgreSQL Relational Schema Script Logic](https://githubusercontent.com)
+    * *Source Code Implementation:* [Review Pure PostgreSQL Relational Schema Script Logic](https://github.com/angeliquegreyling-data-architect/portfolio/blob/main/schema.sql)
 
 ---
 
