@@ -13,7 +13,7 @@
     <header class="site-header">
         <div class="header-content">
             <div class="title-block">
-                <div class="eyebrow">SYSTEM LOG // SYSTEM 06</div>
+                <p class="eyebrow">SYSTEMS ARCHITECTURE // DATA AUTOMATION</p>
                 <h1>Relational Database Architecture &amp; Schema Optimization Sandbox</h1>
                 <p class="professional-title">Technical Architecture Specification &amp; Relational Data Integrity Framework</p>
                 <div class="contact-details">
@@ -23,9 +23,9 @@
                 </div>
             </div>
 
-            <div class="system-clock">
-                <span class="clock-label">SYSTEM STATUS</span>
-                <span class="status-badge">PRODUCTION READY / SCHEMA VERIFIED</span>
+            <div class="system-clock" aria-label="Current UTC system time">
+                <span class="clock-label">UTC SYSTEM TIME</span>
+                <time id="utc-clock">Loading...</time>
             </div>
         </div>
     </header>
@@ -34,11 +34,19 @@
 
         <section class="content-section">
             <div class="section-heading">
-                <span class="section-label">01 // SYSTEM OVERVIEW</span>
+                <p class="section-label">01 // SYSTEM OVERVIEW</p>
                 <h2>Architectural Metrics &amp; Database Strategy</h2>
             </div>
 
             <div class="profile-content">
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">System Status</h4>
+                    <p>
+                        <span class="status-badge" style="padding: 0.25rem 0.55rem; background: rgba(118, 88, 166, 0.2); color: #b9a5df; border: 1px solid rgba(118, 88, 166, 0.5); border-radius: 999px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;">PRODUCTION READY / SCHEMA VERIFIED</span>
+                    </p>
+                </div>
+
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Target Schema Strategy</h4>
                     <p>
@@ -66,12 +74,13 @@
                         and supports high-volume operational reporting.
                     </p>
                 </div>
+
             </div>
         </section>
 
         <section class="content-section">
             <div class="section-heading">
-                <span class="section-label">02 // CORE DATAFLOW</span>
+                <p class="section-label">02 // CORE DATAFLOW</p>
                 <h2>Relational Data Architecture &amp; ERD Map</h2>
             </div>
 
@@ -103,11 +112,12 @@
 
         <section class="content-section">
             <div class="section-heading">
-                <span class="section-label">03 // NORMALIZATION ENGINE</span>
+                <p class="section-label">03 // NORMALIZATION ENGINE</p>
                 <h2>Third-Normal-Form (3NF) Transaction Core</h2>
             </div>
 
             <div class="profile-content">
+
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Structural Minimization &amp; Entity Separation</h4>
                     <p>
@@ -138,16 +148,18 @@
                         transformations into dimensional reporting structures.
                     </p>
                 </div>
+
             </div>
         </section>
 
         <section class="content-section">
             <div class="section-heading">
-                <span class="section-label">04 // REFERENTIAL INTEGRITY</span>
+                <p class="section-label">04 // REFERENTIAL INTEGRITY</p>
                 <h2>Defensive Foreign-Key Clamps &amp; Cascade Enforcement</h2>
             </div>
 
             <div class="profile-content">
+
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Strict Reference Mapping</h4>
                     <p>
@@ -180,16 +192,18 @@
                         traceable transactional audit requirements.
                     </p>
                 </div>
+
             </div>
         </section>
 
         <section class="content-section">
             <div class="section-heading">
-                <span class="section-label">05 // PERFORMANCE ENGINEERING</span>
+                <p class="section-label">05 // PERFORMANCE ENGINEERING</p>
                 <h2>High-Velocity Performance B-Tree Index Tuning</h2>
             </div>
 
             <div class="profile-content">
+
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Index Strategy</h4>
                     <p>
@@ -221,16 +235,18 @@
                         of the underlying operational data.
                     </p>
                 </div>
+
             </div>
         </section>
 
         <section class="content-section">
             <div class="section-heading">
-                <span class="section-label">06 // INTERACTIVE ECOSYSTEM</span>
+                <p class="section-label">06 // INTERACTIVE ECOSYSTEM</p>
                 <h2>Database Exploration &amp; Implementation Resources</h2>
             </div>
 
             <div class="profile-content" style="border-left-color: var(--violet);">
+
                 <div style="margin-bottom: 2rem;">
                     <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Interactive Simulation Canvas</h4>
                     <p>
@@ -256,6 +272,7 @@
                         <a href="schema.sql">Review Pure PostgreSQL Relational Schema Script Logic</a>
                     </p>
                 </div>
+
             </div>
         </section>
 
