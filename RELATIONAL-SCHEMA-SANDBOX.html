@@ -1,631 +1,269 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Relational Database Architecture and Schema Optimization Sandbox - 3NF relational modelling, PostgreSQL constraints, indexing strategy and dimensional translation.">
-  <title>Relational Database Architecture | Angelique Greyling</title>
-  <style>
-    :root {
-      --background: #09090b;
-      --surface: #101217;
-      --surface-light: #161922;
-      --border: #272a32;
-      --cyan: #22d3ee;
-      --violet: #7658A6;
-      --text: #f4f4f5;
-      --secondary: #a1a1aa;
-      --muted: #71717a;
-      --green: #4ade80;
-      --radius: 10px;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      background: var(--background);
-      color: var(--text);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.65;
-    }
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 20px 60px;
-    }
-    .eyebrow {
-      color: var(--cyan);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .status-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 25px;
-    }
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      padding: 7px 12px;
-      border-radius: 5px;
-      color: var(--secondary);
-      font-size: 0.75rem;
-    }
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
-    }
-    section {
-      margin-bottom: 38px;
-    }
-    .section-heading {
-      font-size: 1.15rem;
-      letter-spacing: 0.3px;
-      margin-bottom: 18px;
-    }
-    .section-heading span {
-      color: var(--cyan);
-      margin-right: 8px;
-    }
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 14px;
-    }
-    .metric-card, .engine-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 21px;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .metric-card:hover, .engine-card:hover, .directory-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--cyan);
-      box-shadow: 0 8px 25px rgba(34, 211, 238, 0.06);
-    }
-    .metric-label {
-      color: var(--muted);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 7px;
-    }
-    .metric-value {
-      font-size: 1rem;
-      font-weight: 650;
-      color: var(--text);
-    }
-    .metric-detail {
-      color: var(--secondary);
-      font-size: 0.8rem;
-      margin-top: 5px;
-    }
-    .flow-panel {
-      background: #0d1016;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 25px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .flow-intro {
-      color: var(--secondary);
-      font-size: 0.88rem;
-      margin-bottom: 22px;
-      width: 100%;
-    }
-    .flow-node {
-      background: var(--surface-light);
-      border: 1px solid #343b49;
-      border-radius: 7px;
-      padding: 15px 18px;
-      text-align: center;
-      width: min(100%, 700px);
-    }
-    .flow-node.primary {
-      border-color: var(--cyan);
-      background: rgba(34, 211, 238, 0.055);
-    }
-    .flow-node strong {
-      display: block;
-      color: var(--text);
-      font-size: 0.82rem;
-      letter-spacing: 0.5px;
-    }
-    .flow-node small {
-      display: block;
-      color: var(--secondary);
-      font-size: 0.73rem;
-      margin-top: 4px;
-    }
-    .flow-arrow {
-      color: var(--cyan);
-      text-align: center;
-      font-size: 1.35rem;
-      line-height: 1.5;
-      padding: 4px 0;
-    }
-    .branch-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 5px;
-      width: min(100%, 700px);
-    }
-    .branch-card {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      border-radius: 7px;
-      padding: 16px 12px;
-      text-align: center;
-    }
-    .branch-card strong {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--cyan);
-      margin-bottom: 5px;
-    }
-    .branch-card small {
-      display: block;
-      color: var(--secondary);
-      font-size: 0.7rem;
-    }
-    .flow-caption {
-      margin-top: 20px;
-      color: var(--muted);
-      font-size: 0.73rem;
-      text-align: center;
-    }
-    .engine-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
-      gap: 15px;
-    }
-    .engine-number {
-      color: var(--violet);
-      font-size: 0.75rem;
-      font-weight: 750;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-    .engine-card h3 {
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-    .engine-card p {
-      color: var(--secondary);
-      font-size: 0.84rem;
-    }
-    .detail-list {
-      list-style: none;
-      margin-top: 15px;
-    }
-    .detail-list li {
-      color: var(--secondary);
-      font-size: 0.78rem;
-      padding: 6px 0 6px 17px;
-      position: relative;
-      border-top: 1px solid rgba(39, 42, 50, 0.65);
-    }
-    .detail-list li::before {
-      content: "›";
-      position: absolute;
-      left: 2px;
-      color: var(--cyan);
-    }
-    .normalization-panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-    .normalization-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 22px;
-    }
-    .normalization-card h3 {
-      font-size: 0.95rem;
-      margin-bottom: 10px;
-    }
-    .normalization-card p {
-      color: var(--secondary);
-      font-size: 0.82rem;
-    }
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 15px;
-    }
-    .tag {
-      background: rgba(118, 88, 166, 0.13);
-      border: 1px solid rgba(118, 88, 166, 0.35);
-      color: #c4b5fd;
-      padding: 4px 9px;
-      border-radius: 4px;
-      font-size: 0.68rem;
-    }
-    .constraint-panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 13px;
-    }
-    .constraint-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 17px;
-    }
-    .constraint-item strong {
-      display: block;
-      color: var(--cyan);
-      font-size: 0.83rem;
-      margin-bottom: 6px;
-    }
-    .constraint-item p {
-      color: var(--secondary);
-      font-size: 0.77rem;
-    }
-    .directory-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 15px;
-    }
-    .directory-card {
-      display: block;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      padding: 21px;
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .directory-card:hover {
-      transform: translateY(-3px);
-      border-color: var(--cyan);
-      box-shadow: 0 8px 25px rgba(34, 211, 238, 0.06);
-    }
-    .directory-card .directory-type {
-      color: var(--violet);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    .directory-card h3 {
-      font-size: 0.98rem;
-      margin-bottom: 8px;
-    }
-    .directory-card p {
-      color: var(--secondary);
-      font-size: 0.8rem;
-      margin-bottom: 15px;
-    }
-    .directory-link {
-      color: var(--cyan);
-      font-size: 0.78rem;
-      font-weight: 650;
-    }
-    .directory-card:hover .directory-link {
-      text-decoration: underline;
-    }
-    .note {
-      border-left: 3px solid var(--violet);
-      background: rgba(118, 88, 166, 0.08);
-      padding: 15px 18px;
-      border-radius: 0 6px 6px 0;
-      color: var(--secondary);
-      font-size: 0.8rem;
-    }
-    footer {
-      border-top: 1px solid var(--border);
-      padding-top: 22px;
-      margin-top: 45px;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 0.72rem;
-    }
-    @media (max-width: 700px) {
-      .branch-grid {
-        grid-template-columns: 1fr;
-      }
-      .normalization-panel {
-        grid-template-columns: 1fr;
-      }
-      .flow-panel {
-        padding: 16px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Relational Database Architecture and Schema Optimization Sandbox - 3NF relational modelling, PostgreSQL constraints, indexing strategy and dimensional translation.">
+    <title>Relational Database Architecture &amp; Schema Optimization | Angelique Greyling</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header style="padding: 3.5rem 2rem 2.5rem; border-bottom: 1px solid var(--border); margin-bottom: 4rem; width: 100%;">
-    <div style="width: min(1200px, 100%); margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap;">
-      <div class="title-block">
-        <p class="eyebrow">DATABASE ENGINEERING // SYSTEM 06</p>
-        <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 1rem; color: var(--text);">
-          Relational Database Architecture &amp; Schema Optimization Sandbox
-        </h1>
-        <p class="subtitle" style="color: var(--secondary); max-width: 760px; font-size: 1rem; text-transform: none;">
-          A structured relational data architecture focused on third normal form modelling, referential integrity, query performance, and dimensional translation.
-        </p>
-        <div class="status-row">
-          <span class="status"><span class="status-dot"></span>Schema Verified</span>
-          <span class="status">PostgreSQL Core</span>
-          <span class="status">3NF Relational Engine</span>
-        </div>
-      </div>
-    </div>
-  </header>
-  <main class="container">
-    <!-- =========================================================
-         01 / METRICS GRID
-    ========================================================== -->
-    <section>
-      <h2 class="section-heading"><span>01 /</span> System Overview &amp; Architectural Metrics</h2>
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-label">Architecture Status</div>
-          <div class="metric-value">Schema Verified</div>
-          <div class="metric-detail">Relational structure and constraint strategy</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Architect</div>
-          <div class="metric-value">Angelique Greyling</div>
-          <div class="metric-detail">Principal Systems Solutions Engineer</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Target Schema Strategy</div>
-          <div class="metric-value">3NF + Star Schema</div>
-          <div class="metric-detail">Transactional normalization and dimensional translation</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-label">Database Platform</div>
-          <div class="metric-value">PostgreSQL</div>
-          <div class="metric-detail">Portable relational architecture</div>
-        </div>
-      </div>
-    </section>
 
-    <!-- =========================================================
-         02 / CORE DATAFLOW MAP
-    ========================================================== -->
-    <section>
-      <h2 class="section-heading"><span>02 /</span> Core System Dataflow &amp; ERD Map</h2>
-      <div class="flow-panel">
-        <p class="flow-intro">
-          The architecture separates raw intake, staging and validation from the governed relational core. Validated entities are then exposed to downstream operational and analytical processes.
-        </p>
-        <div class="flow-node">
-          <strong>UPSTREAM SOURCES</strong>
-          <small>Raw transaction records and intake logs</small>
-        </div>
-        <div class="flow-arrow">↓</div>
-        <div class="flow-node">
-          <strong>INGESTION HUB</strong>
-          <small>Source extraction and initial data intake</small>
-        </div>
-        <div class="flow-arrow">↓</div>
-        <div class="flow-node">
-          <strong>DATA STAGING TABLES</strong>
-          <small>De-duplication, data-type validation and normalization checks</small>
-        </div>
-        <div class="flow-arrow">↓</div>
-        <div class="flow-node primary">
-          <strong>RELATIONAL CORE ENGINE</strong>
-          <small>Primary keys, foreign keys, composite relationships and indexing</small>
-        </div>
-        <div class="flow-arrow">↓</div>
-        <div class="branch-grid">
-          <div class="branch-card">
-            <strong>SOURCING CONTRACTS</strong>
-            <small>Composite key relationships</small>
-          </div>
-          <div class="branch-card">
-            <strong>MATERIAL LEDGERS</strong>
-            <small>Operational transaction records</small>
-          </div>
-          <div class="branch-card">
-            <strong>VENDOR INVOICES</strong>
-            <small>Foreign-key reference validation</small>
-          </div>
-        </div>
-        <p class="flow-caption">
-          Logical architecture representation. Actual table names, relationships and execution paths are defined by the implemented schema.
-        </p>
-      </div>
-    </section>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="title-block">
+                <div class="eyebrow">SYSTEM LOG // SYSTEM 06</div>
+                <h1>Relational Database Architecture &amp; Schema Optimization Sandbox</h1>
+                <p class="professional-title">Technical Architecture Specification &amp; Relational Data Integrity Framework</p>
+                <div class="contact-details">
+                    <span>Architect: Angelique Greyling (Principal Systems Solutions Engineer)</span>
+                    <span class="separator">|</span>
+                    <span>PostgreSQL Relational Architecture &amp; Schema Optimization</span>
+                </div>
+            </div>
 
-    <!-- =========================================================
-         03 / CORE ENGINE COMPONENTS
-    ========================================================== -->
-    <section>
-      <h2 class="section-heading"><span>03 /</span> Core Architectural Engine Components</h2>
-      <div class="engine-grid">
-        <article class="engine-card">
-          <div class="engine-number">ENGINE 01</div>
-          <h3>Third-Normal-Form Transaction Core</h3>
-          <p>
-            The transactional model separates independent business entities into distinct relational structures. Transaction records, vendor master data and physical asset information are maintained independently and connected through defined keys.
-          </p>
-          <ul class="detail-list">
-            <li>Reduced redundant storage of master data</li>
-            <li>Clear entity ownership and relationship boundaries</li>
-            <li>Reduced insert, update and deletion anomalies</li>
-            <li>Consistent primary-key identification</li>
-          </ul>
-          <div class="tag-row">
-            <span class="tag">3NF</span>
-            <span class="tag">Primary Keys</span>
-            <span class="tag">Entity Separation</span>
-          </div>
-        </article>
+            <div class="system-clock">
+                <span class="clock-label">SYSTEM STATUS</span>
+                <span class="status-badge">PRODUCTION READY / SCHEMA VERIFIED</span>
+            </div>
+        </div>
+    </header>
 
-        <article class="engine-card">
-          <div class="engine-number">ENGINE 02</div>
-          <h3>Defensive Foreign-Key Constraints</h3>
-          <p>
-            Referential integrity rules enforce valid relationships between dependent records and their parent entities. Composite key assignments can be used where a relationship is identified by more than one attribute.
-          </p>
-          <ul class="detail-list">
-            <li>Foreign-key validation against referenced records</li>
-            <li>Composite primary and foreign-key relationships</li>
-            <li>Controlled update and deletion behaviour</li>
-            <li>Protection against orphaned relational records</li>
-          </ul>
-          <div class="tag-row">
-            <span class="tag">Foreign Keys</span>
-            <span class="tag">Composite Keys</span>
-            <span class="tag">Referential Integrity</span>
-          </div>
-        </article>
+    <main>
 
-        <article class="engine-card">
-          <div class="engine-number">ENGINE 03</div>
-          <h3>B-Tree Index Optimization</h3>
-          <p>
-            Indexes are applied selectively to support common lookup, filtering, joining and ordering patterns. Foreign-key columns and operational timestamps are candidate index targets based on query workload and execution-plan analysis.
-          </p>
-          <ul class="detail-list">
-            <li>Indexing of frequently joined key columns</li>
-            <li>Timestamp filtering and range-query support</li>
-            <li>Improved lookup paths for reporting workloads</li>
-            <li>Query-plan validation and index-cost assessment</li>
-          </ul>
-          <div class="tag-row">
-            <span class="tag">B-Tree</span>
-            <span class="tag">Query Planning</span>
-            <span class="tag">Performance Tuning</span>
-          </div>
-        </article>
-      </div>
-    </section>
-    <!-- =========================================================
-         04 / RELATIONAL NORMALIZATION & ANALYTICAL TRANSLATION
-    ========================================================== -->
-    <section>
-      <h2 class="section-heading"><span>04 /</span> Relational Normalization &amp; Analytical Translation</h2>
-      <div class="normalization-panel">
-        <div class="normalization-card">
-          <h3>Transactional Layer / 3NF</h3>
-          <p>
-            The relational core prioritizes data consistency and controlled updates. Business entities are represented independently, with relationships established through primary and foreign keys. This limits unnecessary duplication and supports reliable operational transactions.
-          </p>
-          <div class="tag-row">
-            <span class="tag">Normalized Entities</span>
-            <span class="tag">Atomic Attributes</span>
-            <span class="tag">Functional Dependencies</span>
-          </div>
-        </div>
-        <div class="normalization-card">
-          <h3>Analytical Layer / Star Schema</h3>
-          <p>
-            For reporting workloads, governed relational data can be translated into dimensional structures. Fact tables capture measurable business events, while dimension tables provide descriptive context for filtering, grouping and analysis.
-          </p>
-          <div class="tag-row">
-            <span class="tag">Fact Tables</span>
-            <span class="tag">Dimension Tables</span>
-            <span class="tag">Reporting Model</span>
-          </div>
-        </div>
-      </div>
-    </section>
+        <section class="content-section">
+            <div class="section-heading">
+                <span class="section-label">01 // SYSTEM OVERVIEW</span>
+                <h2>Architectural Metrics &amp; Database Strategy</h2>
+            </div>
 
-    <!-- =========================================================
-         05 / DATA INTEGRITY & PERFORMANCE CONTROLS
-    ========================================================== -->
-    <section>
-      <h2 class="section-heading"><span>05 /</span> Data Integrity &amp; Performance Controls</h2>
-      <div class="constraint-panel">
-        <div class="constraint-item">
-          <strong>Primary-Key Enforcement</strong>
-          <p>Establishes unique row identity and prevents duplicate primary-key values within relational entities.</p>
-        </div>
-        <div class="constraint-item">
-          <strong>Foreign-Key Validation</strong>
-          <p>Ensures dependent records reference valid parent records, subject to the defined constraint and transaction rules.</p>
-        </div>
-        <div class="constraint-item">
-          <strong>Composite Relationships</strong>
-          <p>Supports business relationships where a single identifier is insufficient to establish record identity or association.</p>
-        </div>
-        <div class="constraint-item">
-          <strong>Data-Type Constraints</strong>
-          <p>Restricts stored values to expected data types and supports consistent treatment of dates, identifiers and measures.</p>
-        </div>
-        <div class="constraint-item">
-          <strong>Index Strategy</strong>
-          <p>Uses workload-informed indexes to improve common query patterns while managing additional storage and write costs.</p>
-        </div>
-        <div class="constraint-item">
-          <strong>Controlled Cascade Behaviour</strong>
-          <p>Defines how related records respond to parent updates or deletions, avoiding unintended changes to dependent data.</p>
-        </div>
-      </div>
-    </section>
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Target Schema Strategy</h4>
+                    <p>
+                        Third Normal Form (3NF) relational mapping, with a structured pathway
+                        for dimensional translation into star-schema analytical models.
+                        The architecture separates transactional integrity from downstream
+                        analytical consumption.
+                    </p>
+                </div>
 
-    <!-- =========================================================
-         06 / INTERACTIVE ECOSYSTEM DIRECTORY
-    ========================================================== -->
-    <section>
-      <h2 class="section-heading"><span>06 /</span> Interactive Ecosystem Directory</h2>
-      <div class="directory-grid">
-        <a class="directory-card" href="https://github.io" target="_blank" rel="noopener noreferrer">
-          <div class="directory-type">Interactive Simulation</div>
-          <h3>Live ERD Explorer &amp; SQL Query Analyzer</h3>
-          <p>Explore relational structures and schema relationships through the interactive database modelling sandbox.</p>
-          <span class="directory-link">Launch Interactive Sandbox ↗</span>
-        </a>
-        <a class="directory-card" href="schema.sql" target="_blank" rel="noopener noreferrer">
-          <div class="directory-type">Source Implementation</div>
-          <h3>PostgreSQL Relational Schema Script</h3>
-          <p>Review the PostgreSQL schema implementation, including relational table definitions and database constraint logic.</p>
-          <span class="directory-link">Review SQL Source ↗</span>
-        </a>
-      </div>
-    </section>
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Database Platform</h4>
+                    <p>
+                        PostgreSQL relational database architecture, designed for compatibility
+                        across enterprise Google Cloud SQL, Amazon RDS and localized deployment
+                        environments.
+                    </p>
+                </div>
 
-    <!-- =========================================================
-         ARCHITECTURE NOTE CALLOUT
-    ========================================================== -->
-    <section>
-      <div class="note">
-        <strong>Architecture note:</strong>
-        PostgreSQL B-Tree indexes, foreign-key constraints and cascade behaviours must be selected and validated against the actual data model and workload. Indexing every foreign key or timestamp is not automatically optimal. Query plans, write volume, cardinality and execution costs should inform final tuning.
-      </div>
-    </section>
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Architectural Objective</h4>
+                    <p>
+                        Establish a normalized, constraint-driven relational foundation that
+                        protects transactional consistency, enforces referential integrity
+                        and supports high-volume operational reporting.
+                    </p>
+                </div>
+            </div>
+        </section>
 
-    <!-- =========================================================
-         FOOTER
-    ========================================================== -->
-    <footer>
-      <span>RELATIONAL DATABASE ARCHITECTURE / SCHEMA OPTIMIZATION</span>
-      <span>Architect: Angelique Greyling</span>
-      <span>PostgreSQL | 3NF | Dimensional Modelling</span>
+        <section class="content-section">
+            <div class="section-heading">
+                <span class="section-label">02 // CORE DATAFLOW</span>
+                <h2>Relational Data Architecture &amp; ERD Map</h2>
+            </div>
+
+            <div class="profile-content">
+                <p>
+                    The ingestion architecture establishes a controlled progression from
+                    upstream transaction sources through staging and validation into the
+                    normalized relational core. Independent business entities are maintained
+                    as distinct relational structures, connected through primary and foreign
+                    key relationships.
+                </p>
+
+                <div style="background: var(--card-background); border: 1px solid var(--border); padding: 2rem; border-radius: var(--card-radius); font-family: monospace; white-space: pre; overflow-x: auto; color: var(--cyan); line-height: 1.4; font-size: 0.9rem;">
+[UPSTREAM SOURCES] ──► (Raw Transaction &amp; Intake Logs)
+                                 │
+                                 ▼
+[INGESTION HUB]   ──► [DATA STAGING TABLES] ──► (De-duplication &amp; Type Constraints)
+                                 │
+                                 ▼
+                      [RELATIONAL CORE ENGINE]
+                                 │
+        ┌────────────────────────┼────────────────────────┐
+        ▼                        ▼                        ▼
+[SOURCING CONTRACTS]    [MATERIAL LEDGERS]       [VENDOR INVOICES]
+  (Composite PKs)         (Performance B-Trees)    (Foreign-Key Clamps)
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <span class="section-label">03 // NORMALIZATION ENGINE</span>
+                <h2>Third-Normal-Form (3NF) Transaction Core</h2>
+            </div>
+
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Structural Minimization &amp; Entity Separation</h4>
+                    <p>
+                        The relational schema enforces structural minimization through
+                        independently defined logical entities. Transaction accounts,
+                        vendor master data and physical asset catalogs are separated
+                        into distinct relational structures rather than duplicated
+                        across operational transaction records.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Anomaly Prevention</h4>
+                    <p>
+                        This separation reduces update, insertion and deletion anomalies
+                        by ensuring that each entity maintains its own authoritative
+                        attributes. Transactional records reference the relevant master
+                        entities through defined relational keys.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Relational Compliance</h4>
+                    <p>
+                        The normalized structure supports consistent business rules and
+                        predictable data relationships across enterprise datasets.
+                        It also provides a stable foundation for subsequent analytical
+                        transformations into dimensional reporting structures.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <span class="section-label">04 // REFERENTIAL INTEGRITY</span>
+                <h2>Defensive Foreign-Key Clamps &amp; Cascade Enforcement</h2>
+            </div>
+
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Strict Reference Mapping</h4>
+                    <p>
+                        Referential integrity constraints protect downstream operations
+                        against orphaned records and invalid entity references. Foreign-key
+                        relationships bind dependent transaction records to valid parent
+                        entities, ensuring that relational dependencies are enforced
+                        at the database boundary.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Composite Key Assignments</h4>
+                    <p>
+                        Where business relationships require more than one identifying
+                        attribute, composite primary and foreign-key assignments provide
+                        a multi-column reference structure. This ensures that dependent
+                        records resolve against the correct parent entity and business
+                        context.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Cascade Governance &amp; Auditability</h4>
+                    <p>
+                        Explicit update and delete behaviours govern how parent-record
+                        modifications affect dependent records. These rules preserve
+                        predictable data lifecycle behaviour during high-volume
+                        modifications and structural changes, while supporting
+                        traceable transactional audit requirements.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <span class="section-label">05 // PERFORMANCE ENGINEERING</span>
+                <h2>High-Velocity Performance B-Tree Index Tuning</h2>
+            </div>
+
+            <div class="profile-content">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Index Strategy</h4>
+                    <p>
+                        PostgreSQL B-Tree indexes are applied to high-value lookup
+                        and relationship columns, including foreign keys and
+                        operational timestamp fields. These indexes improve the
+                        efficiency of equality, range and ordered retrieval operations.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Query &amp; Join Optimization</h4>
+                    <p>
+                        Targeted indexing supports faster table intersections and
+                        relational joins across multi-million-row enterprise datasets.
+                        Index selection is aligned to actual query patterns and
+                        access paths to reduce unnecessary scanning and improve
+                        downstream reporting performance.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Analytical Readiness</h4>
+                    <p>
+                        The optimized relational layer provides a controlled
+                        transactional foundation for front-end semantic architectures.
+                        Normalized source structures can be translated into
+                        dimensional models without compromising the integrity
+                        of the underlying operational data.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <span class="section-label">06 // INTERACTIVE ECOSYSTEM</span>
+                <h2>Database Exploration &amp; Implementation Resources</h2>
+            </div>
+
+            <div class="profile-content" style="border-left-color: var(--violet);">
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Interactive Simulation Canvas</h4>
+                    <p>
+                        Explore the relational entity model, inspect table relationships
+                        and experiment with SQL queries through the interactive database
+                        architecture sandbox.
+                    </p>
+                    <p>
+                        <a href="https://angeliquegreyling-data-architect.github.io/portfolio/enterprise-database-erd-analyzer-sandbox.html" target="_blank" rel="noopener noreferrer">
+                            Launch Live ERD Explorer &amp; SQL Query Analyzer Sandbox
+                        </a>
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--cyan); font-size: 1.1rem; margin-bottom: 0.5rem;">Production Source Code Implementation</h4>
+                    <p>
+                        Review the PostgreSQL relational schema implementation,
+                        including table definitions, primary-key structures,
+                        foreign-key relationships and database constraint logic.
+                    </p>
+                    <p>
+                        <a href="schema.sql">Review Pure PostgreSQL Relational Schema Script Logic</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>ANGELIQUE GREYLING | SOLUTIONS PORTFOLIO SYSTEM LOGS</p>
     </footer>
-  </main>
+
 </body>
 </html>
